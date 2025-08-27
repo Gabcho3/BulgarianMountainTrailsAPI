@@ -1,0 +1,6 @@
+@BulgarianMountainTrailsAPI_HostAddress = http://localhost:5051
+
+GET {{BulgarianMountainTrailsAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
