@@ -1,0 +1,37 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BulgarianMountainTrailsAPI.Data.Models
+{
+    public class MountainHut
+    {
+        public MountainHut()
+        {
+            Id = Guid.NewGuid();
+            TrailHuts = new List<TrailHut>();
+        }
+
+        [Key]
+        public Guid Id { get; set; }
+
+        [Required]
+        public required string Name { get; set; }
+
+        [Required]
+        public required string Mountain { get; set; }
+
+        [Required]
+        public int Altitude { get; set; }
+
+        public int Capacity { get; set; }
+
+        public string? PhoneNumber { get; set; }
+
+        [Required]
+        public double Latitude { get; set; }
+
+        [Required]
+        public double Longitude { get; set; }
+
+        public ICollection<TrailHut> TrailHuts { get; set; }
+    }
+}
