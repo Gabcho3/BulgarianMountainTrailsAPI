@@ -2,9 +2,9 @@
 
 namespace BulgarianMountainTrailsAPI.Data.Models
 {
-    public class MountainHut
+    public class Hut
     {
-        public MountainHut()
+        public Hut()
         {
             Id = Guid.NewGuid();
             TrailHuts = new List<TrailHut>();

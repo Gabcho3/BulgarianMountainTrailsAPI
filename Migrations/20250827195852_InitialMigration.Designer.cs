@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulgarianMountainTrailsAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250827183223_InitialMigration")]
+    [Migration("20250827195852_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace BulgarianMountainTrailsAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BulgarianMountainTrailsAPI.Data.Models.MountainHut", b =>
+            modelBuilder.Entity("BulgarianMountainTrailsAPI.Data.Models.Hut", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,7 +115,7 @@ namespace BulgarianMountainTrailsAPI.Migrations
 
             modelBuilder.Entity("BulgarianMountainTrailsAPI.Data.Models.TrailHut", b =>
                 {
-                    b.HasOne("BulgarianMountainTrailsAPI.Data.Models.MountainHut", "Hut")
+                    b.HasOne("BulgarianMountainTrailsAPI.Data.Models.Hut", "Hut")
                         .WithMany("TrailHuts")
                         .HasForeignKey("HutId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -132,7 +132,7 @@ namespace BulgarianMountainTrailsAPI.Migrations
                     b.Navigation("Trail");
                 });
 
-            modelBuilder.Entity("BulgarianMountainTrailsAPI.Data.Models.MountainHut", b =>
+            modelBuilder.Entity("BulgarianMountainTrailsAPI.Data.Models.Hut", b =>
                 {
                     b.Navigation("TrailHuts");
                 });

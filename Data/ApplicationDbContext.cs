@@ -9,7 +9,7 @@ namespace BulgarianMountainTrailsAPI.Data
             : base(options) { }
 
         public DbSet<Trail> Trails { get; set; }
-        public DbSet<MountainHut> Huts { get; set; }
+        public DbSet<Hut> Huts { get; set; }
         public DbSet<TrailHut> TrailHuts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace BulgarianMountainTrailsAPI.Data
                 .WithOne(th => th.Trail)
                 .HasForeignKey(th => th.TrailId);
 
-            modelBuilder.Entity<MountainHut>()
+            modelBuilder.Entity<Hut>()
                 .HasMany(h => h.TrailHuts)
                 .WithOne(th => th.Hut)
                 .HasForeignKey(th => th.HutId);
