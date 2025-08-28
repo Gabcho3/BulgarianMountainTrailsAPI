@@ -18,12 +18,25 @@ namespace BulgarianMountainTrailsAPI.Controllers
 
         // GET: /api/huts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Hut>>> GetHuts()
+        public async Task<ActionResult<IEnumerable<Hut>>> GetHuts([FromQuery] HutFilter filter)
         {
-            return await _context.Huts
+            var allowedKeys = new[] { "minAltitude", "maxAltitude", "mountain", "minCapacity", "maxCapacity" };
+            var queryKeys = HttpContext.Request.Query.Keys;
+
+            var invalidKeys = queryKeys.Except(allowedKeys, StringComparer.OrdinalIgnoreCase);
+            if (invalidKeys.Any())
+            {
+                return BadRequest($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
+            }
+
+            var query = FilterHuts(filter.MinAltitude, filter.MaxAltitude, filter.Mountain, filter.MinCapacity, filter.MaxCapacity);
+
+            var huts = await query
                 .Include(h => h.TrailHuts)
                 .ThenInclude(th => th.Trail)
                 .ToListAsync();
+
+            return huts;
         }
 
         // GET: /api/huts/{id}
@@ -38,18 +51,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             if (hut == null)
                 return NotFound();
 
-            return hut;
-        }
-
-        // GET: /api/huts/mountain/{mountain}
-        [HttpGet("mountain/{mountain}")]
-        public async Task<ActionResult<IEnumerable<Hut>>> GetHutsByMountain(string mountain)
-        {
-            return await _context.Huts
-                .Where(h => h.Mountain.ToLower() == mountain.ToLower())
-                .Include(h => h.TrailHuts)
-                .ThenInclude(th => th.Trail)
-                .ToListAsync();
+            return Ok(hut);
         }
 
         // POST: /api/huts{body}
@@ -75,6 +77,37 @@ namespace BulgarianMountainTrailsAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Accepted();
+        }
+
+        private IQueryable<Hut> FilterHuts(int? minAltitude, int? maxAltitude, string? mountain, int? minCapacity, int? maxCapacity)
+        {
+            var query = _context.Huts.AsQueryable();
+
+            if (minAltitude.HasValue)
+                query = query.Where(h => h.Altitude >= minAltitude.Value);
+
+            if (maxAltitude.HasValue)
+                query = query.Where(h => h.Altitude <= maxAltitude.Value);
+
+            if (!string.IsNullOrEmpty(mountain))
+                query = query.Where(h => h.Mountain.ToLower() == mountain.ToLower());
+
+            if (minCapacity.HasValue)
+                query = query.Where(h => h.Capacity >= minCapacity.Value);
+
+            if (maxCapacity.HasValue)
+                query = query.Where(h => h.Capacity <= maxCapacity.Value);
+
+            return query;
+        }
+
+        public class HutFilter
+        {
+            public string? Mountain { get; set; }
+            public int? MinAltitude { get; set; }
+            public int? MaxAltitude { get; set; }
+            public int? MinCapacity { get; set; }
+            public int? MaxCapacity { get; set; }
         }
     }
 }

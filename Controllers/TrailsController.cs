@@ -18,7 +18,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             this._context = context;
         }
 
-        // GET: /api/trails
+        // GET: /api/trails?minHours=&maxHours=&difficulty=&mountain=&minKm=&maxKm=
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Trail>>> GetTrails([FromQuery] TrailFilter filter)
         {
@@ -66,7 +66,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             if (trail == null)
                 return NotFound();
 
-            return trail;
+            return Ok(trail);
         }
 
         // POST: /api/trails/{body}
