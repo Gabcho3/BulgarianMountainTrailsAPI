@@ -1,5 +1,7 @@
-﻿using BulgarianMountainTrailsAPI.Data;
+﻿using AutoMapper;
+using BulgarianMountainTrailsAPI.Data;
 using BulgarianMountainTrailsAPI.Data.Models;
+using BulgarianMountainTrailsAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +12,12 @@ namespace BulgarianMountainTrailsAPI.Controllers
     public class TrailHutController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TrailHutController(ApplicationDbContext context)
+        public TrailHutController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: /api/trailhut/trail/{id}
@@ -22,7 +26,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
         {
             var huts = await _context.TrailHuts
                 .Where(th => th.TrailId == trailId)
-                .Select(th => th.Hut)
+                .Select(th => _mapper.Map<SimpleHutDto>(th.Hut))
                 .ToListAsync();
 
             return Ok(huts);
@@ -34,7 +38,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
         {
             var trails = await _context.TrailHuts
                 .Where(th => th.HutId == hutId)
-                .Select(th => th.Trail)
+                .Select(th => _mapper.Map<SimpleTrailDto>(th.Trail))
                 .ToListAsync();
 
             return Ok(trails);
