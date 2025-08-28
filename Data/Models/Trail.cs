@@ -1,5 +1,6 @@
 ﻿using BulgarianMountainTrailsAPI.Data.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BulgarianMountainTrailsAPI.Data.Models
 {
@@ -21,6 +22,7 @@ namespace BulgarianMountainTrailsAPI.Data.Models
         public required string Mountain { get; set; }
 
         [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public DifficultyEnum Difficulty { get; set; }
 
         [Required]

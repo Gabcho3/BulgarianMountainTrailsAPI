@@ -1,7 +1,9 @@
 ﻿using BulgarianMountainTrailsAPI.Data;
+using BulgarianMountainTrailsAPI.Data.Enums;
 using BulgarianMountainTrailsAPI.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BulgarianMountainTrailsAPI.Controllers
 {
@@ -18,12 +20,38 @@ namespace BulgarianMountainTrailsAPI.Controllers
 
         // GET: /api/trails
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Trail>>> GetTrails()
+        public async Task<ActionResult<IEnumerable<Trail>>> GetTrails([FromQuery] TrailFilter filter)
         {
-            return await _context.Trails
+            var allowedKeys = new[] { "minHours", "maxHours", "difficulty", "mountain", "minKm", "maxKm" };
+            var queryKeys = HttpContext.Request.Query.Keys;
+
+            var invalidKeys = queryKeys.Except(allowedKeys, StringComparer.OrdinalIgnoreCase);
+            if (invalidKeys.Any())
+            {
+                return BadRequest($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
+            }
+
+            var query = FilterTrails(filter.MinHours, filter.MaxHours, filter.Mountain, filter.MinKm, filter.MaxKm);
+
+            if (!filter.Difficulty.IsNullOrEmpty())
+            {
+                bool isValidDifficulty = Enum.TryParse<DifficultyEnum>(filter.Difficulty, true, out var difficultyEnum);
+
+                if (!isValidDifficulty)
+                    return BadRequest("Invalid difficulty level.");
+
+                query = query.Where(t => t.Difficulty == difficultyEnum);
+            }
+
+            var trails =  await query
                 .Include(t => t.TrailHuts)
                 .ThenInclude(th => th.Hut)
                 .ToListAsync();
+
+            if (trails.Count == 0)
+                return NotFound("No trails found matching the criteria.");
+
+            return trails;
         }
 
         // GET: /api/trails/{id}
@@ -64,6 +92,38 @@ namespace BulgarianMountainTrailsAPI.Controllers
             await _context.SaveChangesAsync();
 
             return Accepted();
+        }
+
+        private IQueryable<Trail> FilterTrails(double? minHours, double? maxHours, string? mountain, double? minKm, double? maxKm)
+        {
+            var query = _context.Trails.AsQueryable();
+
+            if (minHours.HasValue)
+                query = query.Where(t => t.DurationHours >= minHours.Value);
+
+            if (maxHours.HasValue)
+                query = query.Where(t => t.DurationHours <= maxHours.Value);
+
+            if (!mountain.IsNullOrEmpty())
+                query = query.Where(t => t.Mountain.ToLower() == mountain!.ToLower());
+
+            if (minKm.HasValue)
+                query = query.Where(t => t.LengthKm >= minKm.Value);
+
+            if (maxKm.HasValue)
+                query = query.Where(t => t.LengthKm <= maxKm.Value);
+
+            return query;
+        }
+
+        public class TrailFilter
+        {
+            public double? MinHours { get; set; }
+            public double? MaxHours { get; set; }
+            public string? Difficulty { get; set; }
+            public string? Mountain { get; set; }
+            public double? MinKm { get; set; }
+            public double? MaxKm { get; set; }
         }
     }
 }

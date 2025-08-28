@@ -47,6 +47,8 @@ namespace BulgarianMountainTrailsAPI.Controllers
         {
             return await _context.Huts
                 .Where(h => h.Mountain.ToLower() == mountain.ToLower())
+                .Include(h => h.TrailHuts)
+                .ThenInclude(th => th.Trail)
                 .ToListAsync();
         }
 
