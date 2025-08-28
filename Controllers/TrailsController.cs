@@ -1,6 +1,8 @@
-﻿using BulgarianMountainTrailsAPI.Data;
+﻿using AutoMapper;
+using BulgarianMountainTrailsAPI.Data;
 using BulgarianMountainTrailsAPI.Data.Enums;
 using BulgarianMountainTrailsAPI.Data.Models;
+using BulgarianMountainTrailsAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,15 +14,17 @@ namespace BulgarianMountainTrailsAPI.Controllers
     public class TrailsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TrailsController(ApplicationDbContext context)
+        public TrailsController(ApplicationDbContext context, IMapper mapper)
         {
             this._context = context;
+            this._mapper = mapper;
         }
 
         // GET: /api/trails?minHours=&maxHours=&difficulty=&mountain=&minKm=&maxKm=
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Trail>>> GetTrails([FromQuery] TrailFilter filter)
+        public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrails([FromQuery] TrailFilter filter)
         {
             var allowedKeys = new[] { "minHours", "maxHours", "difficulty", "mountain", "minKm", "maxKm" };
             var queryKeys = HttpContext.Request.Query.Keys;
@@ -33,7 +37,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
 
             var query = FilterTrails(filter.MinHours, filter.MaxHours, filter.Mountain, filter.MinKm, filter.MaxKm);
 
-            if (!filter.Difficulty.IsNullOrEmpty())
+            if (filter.Difficulty != null)
             {
                 bool isValidDifficulty = Enum.TryParse<DifficultyEnum>(filter.Difficulty, true, out var difficultyEnum);
 
@@ -46,6 +50,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             var trails =  await query
                 .Include(t => t.TrailHuts)
                 .ThenInclude(th => th.Hut)
+                .Select(t => _mapper.Map<TrailDto>(t))
                 .ToListAsync();
 
             if (trails.Count == 0)
@@ -66,7 +71,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             if (trail == null)
                 return NotFound();
 
-            return Ok(trail);
+            return trail;
         }
 
         // POST: /api/trails/{body}
@@ -104,7 +109,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             if (maxHours.HasValue)
                 query = query.Where(t => t.DurationHours <= maxHours.Value);
 
-            if (!mountain.IsNullOrEmpty())
+            if (mountain != null)
                 query = query.Where(t => t.Mountain.ToLower() == mountain!.ToLower());
 
             if (minKm.HasValue)

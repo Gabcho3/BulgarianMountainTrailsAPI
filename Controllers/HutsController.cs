@@ -1,5 +1,7 @@
-﻿using BulgarianMountainTrailsAPI.Data;
+﻿using AutoMapper;
+using BulgarianMountainTrailsAPI.Data;
 using BulgarianMountainTrailsAPI.Data.Models;
+using BulgarianMountainTrailsAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,15 +12,17 @@ namespace BulgarianMountainTrailsAPI.Controllers
     public class HutsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public HutsController(ApplicationDbContext context)
+        public HutsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: /api/huts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Hut>>> GetHuts([FromQuery] HutFilter filter)
+        public async Task<ActionResult<IEnumerable<HutDto>>> GetHuts([FromQuery] HutFilter filter)
         {
             var allowedKeys = new[] { "minAltitude", "maxAltitude", "mountain", "minCapacity", "maxCapacity" };
             var queryKeys = HttpContext.Request.Query.Keys;
@@ -34,7 +38,11 @@ namespace BulgarianMountainTrailsAPI.Controllers
             var huts = await query
                 .Include(h => h.TrailHuts)
                 .ThenInclude(th => th.Trail)
+                .Select(h => _mapper.Map<HutDto>(h))
                 .ToListAsync();
+
+            if (huts.Count == 0)
+                return NotFound("No trails found matching the criteria.");
 
             return huts;
         }
@@ -51,7 +59,7 @@ namespace BulgarianMountainTrailsAPI.Controllers
             if (hut == null)
                 return NotFound();
 
-            return Ok(hut);
+            return hut;
         }
 
         // POST: /api/huts{body}
