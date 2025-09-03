@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+
 using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Core.Interfaces;
+
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
-using BulgarianMountainTrails.Data.Enums;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -14,16 +16,19 @@ namespace BulgarianMountainTrails.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private ITrailService _service;
 
-        public TrailsController(ApplicationDbContext context, IMapper mapper)
+        public TrailsController(ITrailService service, ApplicationDbContext context, IMapper mapper)
         {
+            _service = service;
             _context = context;
             _mapper = mapper;
         }
 
         // GET: /api/trails?minHours=&maxHours=&difficulty=&mountain=&minKm=&maxKm=
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrails([FromQuery] TrailFilter filter)
+        public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrails
+            ([FromQuery] double? minHours, double? maxHours, double? minKm, double? maxKm, string? mountain, string? difficulty)
         {
             var allowedKeys = new[] { "minHours", "maxHours", "difficulty", "mountain", "minKm", "maxKm" };
             var queryKeys = HttpContext.Request.Query.Keys;
@@ -33,29 +38,21 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 return BadRequest($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
             }
+            
 
-            var query = FilterTrails(filter.MinHours, filter.MaxHours, filter.Mountain, filter.MinKm, filter.MaxKm);
-
-            if (filter.Difficulty != null)
+            try
             {
-                bool isValidDifficulty = Enum.TryParse<DifficultyEnum>(filter.Difficulty, true, out var difficultyEnum);
+                var trails = await _service.GetAllAsync(minHours, maxHours, minKm, maxKm, difficulty, mountain);
 
-                if (!isValidDifficulty)
-                    return BadRequest("Invalid difficulty level.");
+                if (!trails.Any())
+                    return NotFound("No trails found matching the criteria.");
 
-                query = query.Where(t => t.Difficulty == difficultyEnum);
+                return Ok(trails);
             }
-
-            var trails =  await query
-                .Include(t => t.TrailHuts)
-                .ThenInclude(th => th.Hut)
-                .Select(t => _mapper.Map<TrailDto>(t))
-                .ToListAsync();
-
-            if (trails.Count == 0)
-                return NotFound("No trails found matching the criteria.");
-
-            return trails;
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET: /api/trails/{id}
@@ -96,38 +93,6 @@ namespace BulgarianMountainTrails.API.Controllers
             await _context.SaveChangesAsync();
 
             return Accepted();
-        }
-
-        private IQueryable<Trail> FilterTrails(double? minHours, double? maxHours, string? mountain, double? minKm, double? maxKm)
-        {
-            var query = _context.Trails.AsQueryable();
-
-            if (minHours.HasValue)
-                query = query.Where(t => t.DurationHours >= minHours.Value);
-
-            if (maxHours.HasValue)
-                query = query.Where(t => t.DurationHours <= maxHours.Value);
-
-            if (mountain != null)
-                query = query.Where(t => t.Mountain.ToLower() == mountain!.ToLower());
-
-            if (minKm.HasValue)
-                query = query.Where(t => t.LengthKm >= minKm.Value);
-
-            if (maxKm.HasValue)
-                query = query.Where(t => t.LengthKm <= maxKm.Value);
-
-            return query;
-        }
-
-        public class TrailFilter
-        {
-            public double? MinHours { get; set; }
-            public double? MaxHours { get; set; }
-            public string? Difficulty { get; set; }
-            public string? Mountain { get; set; }
-            public double? MinKm { get; set; }
-            public double? MaxKm { get; set; }
         }
     }
 }

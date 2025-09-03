@@ -1,11 +1,16 @@
-using BulgarianMountainTrails.Core.Helpers;
-using BulgarianMountainTrails.Data;
 using Microsoft.EntityFrameworkCore;
+
+using BulgarianMountainTrails.Core.Helpers;
+using BulgarianMountainTrails.Core.Interfaces;
+using BulgarianMountainTrails.Core.Services;
+
+using BulgarianMountainTrails.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<ApplicationDbContext>();
+builder.Services.AddScoped<ITrailService, TrailService>();
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AppProfile)));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
