@@ -1,4 +1,4 @@
-﻿namespace BulgarianMountainTrailsAPI.DTOs
+﻿namespace BulgarianMountainTrails.Core.DTOs
 {
     public class TrailDto
     {

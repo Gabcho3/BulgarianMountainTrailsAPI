@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
-using BulgarianMountainTrailsAPI.Data;
-using BulgarianMountainTrailsAPI.Data.Enums;
-using BulgarianMountainTrailsAPI.Data.Models;
-using BulgarianMountainTrailsAPI.DTOs;
+using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Data;
+using BulgarianMountainTrails.Data.Entities;
+using BulgarianMountainTrails.Data.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
-namespace BulgarianMountainTrailsAPI.Controllers
+namespace BulgarianMountainTrails.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,8 +17,8 @@ namespace BulgarianMountainTrailsAPI.Controllers
 
         public TrailsController(ApplicationDbContext context, IMapper mapper)
         {
-            this._context = context;
-            this._mapper = mapper;
+            _context = context;
+            _mapper = mapper;
         }
 
         // GET: /api/trails?minHours=&maxHours=&difficulty=&mountain=&minKm=&maxKm=

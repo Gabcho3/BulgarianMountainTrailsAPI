@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using BulgarianMountainTrailsAPI.Data.Models;
-using BulgarianMountainTrailsAPI.DTOs;
+using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Data.Entities;
 
-namespace BulgarianMountainTrailsAPI.Helpers
+namespace BulgarianMountainTrails.Core.Helpers
 {
     public class AppProfile : Profile
     {

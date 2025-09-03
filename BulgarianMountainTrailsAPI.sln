@@ -4,6 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulgarianMountainTrails.API", "BulgarianMountainTrails.API\BulgarianMountainTrails.API.csproj", "{DC44D8BB-AFA4-FE16-F061-BC4FCA3BEA05}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F7B846A9-12CA-4223-868E-D80FE5981345} = {F7B846A9-12CA-4223-868E-D80FE5981345}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulgarianMountainTrails.Data", "BulgarianMountainTrails.Data\BulgarianMountainTrails.Data.csproj", "{1BB2DB36-962F-46DE-AE3B-671D6F456DA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulgarianMountainTrails.Core", "BulgarianMountainTrails.Core\BulgarianMountainTrails.Core.csproj", "{F7B846A9-12CA-4223-868E-D80FE5981345}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1BB2DB36-962F-46DE-AE3B-671D6F456DA2} = {1BB2DB36-962F-46DE-AE3B-671D6F456DA2}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +25,14 @@ Global
 		{DC44D8BB-AFA4-FE16-F061-BC4FCA3BEA05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC44D8BB-AFA4-FE16-F061-BC4FCA3BEA05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC44D8BB-AFA4-FE16-F061-BC4FCA3BEA05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BB2DB36-962F-46DE-AE3B-671D6F456DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BB2DB36-962F-46DE-AE3B-671D6F456DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BB2DB36-962F-46DE-AE3B-671D6F456DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BB2DB36-962F-46DE-AE3B-671D6F456DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7B846A9-12CA-4223-868E-D80FE5981345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7B846A9-12CA-4223-868E-D80FE5981345}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7B846A9-12CA-4223-868E-D80FE5981345}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B846A9-12CA-4223-868E-D80FE5981345}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

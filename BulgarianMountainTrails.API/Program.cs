@@ -1,5 +1,5 @@
+using BulgarianMountainTrails.Core.Helpers;
 using BulgarianMountainTrails.Data;
-using BulgarianMountainTrailsAPI.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

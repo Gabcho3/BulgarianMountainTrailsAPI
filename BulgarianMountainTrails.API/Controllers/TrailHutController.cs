@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using BulgarianMountainTrailsAPI.Data;
-using BulgarianMountainTrailsAPI.Data.Models;
-using BulgarianMountainTrailsAPI.DTOs;
+using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Data;
+using BulgarianMountainTrails.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BulgarianMountainTrailsAPI.Controllers
+namespace BulgarianMountainTrails.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
