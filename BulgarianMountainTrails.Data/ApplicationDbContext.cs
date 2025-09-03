@@ -1,7 +1,7 @@
-﻿using BulgarianMountainTrailsAPI.Data.Models;
+﻿using BulgarianMountainTrails.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BulgarianMountainTrailsAPI.Data
+namespace BulgarianMountainTrails.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -29,6 +29,5 @@ namespace BulgarianMountainTrailsAPI.Data
                 .WithOne(th => th.Hut)
                 .HasForeignKey(th => th.HutId);
         }
-
     }
 }

@@ -1,4 +1,4 @@
-using BulgarianMountainTrailsAPI.Data;
+using BulgarianMountainTrails.Data;
 using BulgarianMountainTrailsAPI.Helpers;
 using Microsoft.EntityFrameworkCore;
 

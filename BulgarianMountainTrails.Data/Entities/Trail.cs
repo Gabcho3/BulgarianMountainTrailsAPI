@@ -1,8 +1,8 @@
-﻿using BulgarianMountainTrailsAPI.Data.Enums;
+﻿using BulgarianMountainTrails.Data.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace BulgarianMountainTrailsAPI.Data.Models
+namespace BulgarianMountainTrails.Data.Entities
 {
     public class Trail
     {

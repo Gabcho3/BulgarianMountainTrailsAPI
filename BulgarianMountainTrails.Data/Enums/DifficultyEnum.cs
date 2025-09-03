@@ -1,4 +1,4 @@
-﻿namespace BulgarianMountainTrailsAPI.Data.Enums
+﻿namespace BulgarianMountainTrails.Data.Enums
 {
     public enum DifficultyEnum
     {
