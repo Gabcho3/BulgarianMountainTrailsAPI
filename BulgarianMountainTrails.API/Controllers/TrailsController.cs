@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
@@ -15,14 +13,12 @@ namespace BulgarianMountainTrails.API.Controllers
     public class TrailsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
         private ITrailService _service;
 
-        public TrailsController(ITrailService service, ApplicationDbContext context, IMapper mapper)
+        public TrailsController(ITrailService service, ApplicationDbContext context)
         {
             _service = service;
             _context = context;
-            _mapper = mapper;
         }
 
         // GET: /api/trails?minHours=&maxHours=&difficulty=&mountain=&minKm=&maxKm=
@@ -38,7 +34,6 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 return BadRequest($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
             }
-            
 
             try
             {
@@ -59,15 +54,12 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Trail>> GetTrail(Guid id)
         {
-            var trail = await _context.Trails
-                .Include(t => t.TrailHuts)
-                .ThenInclude(th => th.Hut)
-                .FirstOrDefaultAsync(t => t.Id == id);
+            var trail = await _service.GetByIdAsync(id);
 
             if (trail == null)
-                return NotFound();
+                return NotFound("There is not a Trail with this Id!");
 
-            return trail;
+            return Ok(trail);
         }
 
         // POST: /api/trails/{body}

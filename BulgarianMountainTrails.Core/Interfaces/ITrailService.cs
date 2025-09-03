@@ -12,7 +12,5 @@ namespace BulgarianMountainTrails.Core.Interfaces
         Task<TrailDto> CreateAsync(Trail trail);
 
         Task<bool> DeleteAsync(int id);
-
-        Task<IEnumerable<TrailDto>> SearchAsync(int? maxHours, string? difficulty, string? mountain);
     }
 }

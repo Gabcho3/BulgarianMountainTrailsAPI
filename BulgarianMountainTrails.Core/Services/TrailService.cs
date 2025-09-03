@@ -23,13 +23,6 @@ namespace BulgarianMountainTrails.Core.Services
 
         public async Task<IEnumerable<TrailDto>> GetAllAsync(double? minHours, double? maxHours, double? minKm, double? maxKm, string? difficulty, string? mountain)
         {
-
-            if (minHours.HasValue && maxHours.HasValue && minHours > maxHours)
-                throw new ArgumentException("MinHours cannot be greater than MaxHours!");
-
-            if (minKm.HasValue && maxKm.HasValue && minKm > maxKm)
-                throw new ArgumentException("MinKm cannot be greater than MaxKm!");
-
             var query = FilterTrails(minHours, maxHours, minKm, maxKm, mountain, difficulty);
 
             return await query
@@ -40,22 +33,23 @@ namespace BulgarianMountainTrails.Core.Services
                 .ToListAsync();
         }
 
+        public async Task<TrailDto?> GetByIdAsync(Guid id)
+        {
+            var trail = await _context.Trails
+                .AsNoTracking()
+                .Include(t => t.TrailHuts)
+                .ThenInclude(th => th.Hut)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            return _mapper.Map<TrailDto>(trail);
+        }
+
         public Task<TrailDto> CreateAsync(Trail trail)
         {
             throw new NotImplementedException();
         }
 
         public Task<bool> DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<TrailDto?> GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<TrailDto>> SearchAsync(int? maxHours, string? difficulty, string? mountain)
         {
             throw new NotImplementedException();
         }
