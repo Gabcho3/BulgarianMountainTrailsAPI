@@ -83,15 +83,16 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrail(Guid id)
         {
-            var trail = await _context.Trails.FindAsync(id);
+            try
+            {
+                await _service.DeleteAsync(id);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            if (trail == null)
-                return NotFound();
-
-            _context.Trails.Remove(trail);
-            await _context.SaveChangesAsync();
-
-            return Accepted();
+            return Ok("Successfully deleted!");
         }
     }
 }

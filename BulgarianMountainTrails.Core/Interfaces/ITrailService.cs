@@ -11,6 +11,6 @@ namespace BulgarianMountainTrails.Core.Interfaces
 
         Task CreateAsync(TrailDto trailDto);
 
-        Task<bool> DeleteAsync(Guid id);
+        Task DeleteAsync(Guid id);
     }
 }

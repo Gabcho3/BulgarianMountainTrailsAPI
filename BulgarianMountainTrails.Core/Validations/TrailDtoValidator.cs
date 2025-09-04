@@ -18,8 +18,8 @@ namespace BulgarianMountainTrails.Core.Validations
                 .MaximumLength(100).WithMessage("Mountain name must not exceed 100 characters!");
 
             RuleFor(t => t.Difficulty)
-                .NotEmpty().WithMessage("Difficulty level is required!\nYou can choose from: Unknown, Easy, Medium, Hard ")
-                .Must(d => Enum.TryParse<DifficultyEnum>(d, true, out _)).WithMessage("Invalid difficulty level!");
+                .NotEmpty().WithMessage("Difficulty level is required!")
+                .Must(d => Enum.TryParse<DifficultyEnum>(d, true, out _)).WithMessage("Invalid difficulty level!\nYou can choose from: Unknown, Easy, Medium, Hard.");
 
             RuleFor(t => t.LengthKm)
                 .GreaterThan(0).WithMessage("Length must be greater than 0 kilometers!");

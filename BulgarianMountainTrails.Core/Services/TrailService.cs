@@ -67,9 +67,19 @@ namespace BulgarianMountainTrails.Core.Services
             return;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new InvalidCastException();
+            var trail = await _context.Trails.FindAsync(id);
+
+            if (trail == null)
+            {
+                throw new ArgumentException("There is not a Trail with this Id!");
+            }
+
+            _context.Remove(trail);
+            await _context.SaveChangesAsync();
+
+            return;
         }
 
         private IQueryable<Trail> FilterTrails(double? minHours, double? maxHours, double? minKm, double? maxKm, string? mountain, string? difficulty)
