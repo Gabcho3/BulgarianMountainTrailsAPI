@@ -1,8 +1,12 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
+
+using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Helpers;
 using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Core.Services;
+using BulgarianMountainTrails.Core.Validations;
 
 using BulgarianMountainTrails.Data;
 
@@ -16,7 +20,10 @@ builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AppProfile)));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();
+
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

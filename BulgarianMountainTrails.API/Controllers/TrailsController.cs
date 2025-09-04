@@ -64,10 +64,17 @@ namespace BulgarianMountainTrails.API.Controllers
 
         // POST: /api/trails/{body}
         [HttpPost]
-        public async Task<ActionResult<Trail>> PostTrail(Trail trail)
+        public async Task<ActionResult<TrailDto>> PostTrail(TrailDto trail)
         {
-            await _context.Trails.AddAsync(trail);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _service.CreateAsync(trail);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
 
             return CreatedAtAction(nameof(GetTrail), new { id = trail.Id }, trail);
         }

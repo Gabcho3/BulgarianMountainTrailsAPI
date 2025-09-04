@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
+
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using BulgarianMountainTrails.Data.Enums;
+
 
 namespace BulgarianMountainTrails.Core.Services
 {
@@ -14,11 +17,13 @@ namespace BulgarianMountainTrails.Core.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IValidator<TrailDto> _validator;   
 
-        public TrailService(ApplicationDbContext context, IMapper mapper)
+        public TrailService(ApplicationDbContext context, IMapper mapper, IValidator<TrailDto> validator)
         {
             _context = context;
             _mapper = mapper;
+            _validator = validator;
         }
 
         public async Task<IEnumerable<TrailDto>> GetAllAsync(double? minHours, double? maxHours, double? minKm, double? maxKm, string? difficulty, string? mountain)
@@ -44,14 +49,27 @@ namespace BulgarianMountainTrails.Core.Services
             return _mapper.Map<TrailDto>(trail);
         }
 
-        public Task<TrailDto> CreateAsync(Trail trail)
+        public async Task CreateAsync(TrailDto trailDto)
         {
-            throw new NotImplementedException();
+            var validationResult = await _validator.ValidateAsync(trailDto);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
+                throw new ArgumentException($"Trail validation failed:\n{errors}");
+            }
+
+            var trail = _mapper.Map<Trail>(trailDto);
+
+            await _context.Trails.AddAsync(trail);
+            await _context.SaveChangesAsync();
+
+            return;
         }
 
-        public Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            throw new InvalidCastException();
         }
 
         private IQueryable<Trail> FilterTrails(double? minHours, double? maxHours, double? minKm, double? maxKm, string? mountain, string? difficulty)
