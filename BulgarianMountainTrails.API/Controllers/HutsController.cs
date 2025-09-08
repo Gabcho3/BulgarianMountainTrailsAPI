@@ -47,7 +47,7 @@ namespace BulgarianMountainTrails.API.Controllers
                     return NotFound("No huts found matching the criteria.");
 
                 return Ok(huts);
-            } 
+            }
             catch (Exception ex)
             {
                 return BadRequest($"{ex.Message}");
@@ -80,15 +80,16 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHut(Guid id)
         {
-            var hut = await _context.Huts.FindAsync(id);
+            try
+            {
+                await _service.DeleteAsync(id);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            if (hut == null)
-                return NotFound();
-
-            _context.Huts.Remove(hut);
-            await _context.SaveChangesAsync();
-
-            return Accepted();
+            return Ok("Successfully deleted!");
         }
     }
 }

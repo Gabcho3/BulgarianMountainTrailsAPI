@@ -51,9 +51,19 @@ namespace BulgarianMountainTrails.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var hut = await _context.Huts.FindAsync(id);
+
+            if (hut == null)
+            {
+                throw new ArgumentException("There is not a Hut with this Id!");
+            }
+
+            _context.Remove(hut);
+            await _context.SaveChangesAsync();
+
+            return;
         }
 
         private IQueryable<Hut> FilterHuts(int? minAltitude, int? maxAltitude, string? mountain, int? minCapacity, int? maxCapacity)
