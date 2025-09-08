@@ -46,9 +46,22 @@ namespace BulgarianMountainTrails.Core.Services
             return _mapper.Map<HutDto>(hut);
         }
 
-        public Task<HutDto> CreateAsync(HutDto hutDto)
+        public async Task CreateAsync(HutDto hutDto)
         {
-            throw new NotImplementedException();
+            var validationResult = await _validator.ValidateAsync(hutDto);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
+                throw new ArgumentException($"Hut validation failed:\n{errors}");
+            }
+
+            var hut = _mapper.Map<Hut>(hutDto);
+
+            await _context.Huts.AddAsync(hut);
+            await _context.SaveChangesAsync();
+
+            return;
         }
 
         public async Task DeleteAsync(Guid id)

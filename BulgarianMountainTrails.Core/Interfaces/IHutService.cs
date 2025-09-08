@@ -8,7 +8,7 @@ namespace BulgarianMountainTrails.Core.Interfaces
 
         Task<HutDto?> GetByIdAsync(Guid id);
 
-        Task<HutDto> CreateAsync(HutDto hutDto);
+        Task CreateAsync(HutDto hutDto);
 
         Task DeleteAsync(Guid id);
     }

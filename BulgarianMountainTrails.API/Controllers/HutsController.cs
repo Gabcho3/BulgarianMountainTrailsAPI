@@ -1,11 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
-using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 
 namespace BulgarianMountainTrails.API.Controllers
@@ -14,14 +11,10 @@ namespace BulgarianMountainTrails.API.Controllers
     [ApiController]
     public class HutsController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IHutService _service;
-        private readonly IMapper _mapper;
 
-        public HutsController(ApplicationDbContext context, IMapper mapper, IHutService service)
+        public HutsController(IHutService service)
         {
-            _context = context;
-            _mapper = mapper;
             _service = service;
         }
 
@@ -68,10 +61,16 @@ namespace BulgarianMountainTrails.API.Controllers
 
         // POST: /api/huts{body}
         [HttpPost]
-        public async Task<ActionResult<Hut>> PostHut(Hut hut)
+        public async Task<ActionResult<HutDto>> PostHut(HutDto hut)
         {
-            await _context.Huts.AddAsync(hut);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _service.CreateAsync(hut);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             return CreatedAtAction(nameof(GetHut), new { id = hut.Id }, hut);
         }
