@@ -41,7 +41,7 @@ namespace BulgarianMountainTrails.API.Controllers
 
             try
             {
-                var huts = await _service.GetAllHutsAsync(minAltitude, maxAltitude, minCapacity, maxCapacity, mountain);
+                var huts = await _service.GetAllAsync(minAltitude, maxAltitude, minCapacity, maxCapacity, mountain);
 
                 if (!huts.Any())
                     return NotFound("No huts found matching the criteria.");
@@ -58,15 +58,12 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hut>> GetHut(Guid id)
         {
-            var hut = await _context.Huts
-                .Include(h => h.TrailHuts)
-                .ThenInclude(th => th.Trail)
-                .FirstOrDefaultAsync(h => h.Id == id);
+            var hut = await _service.GetByIdAsync(id);
 
             if (hut == null)
-                return NotFound();
+                return NotFound("There is not a Hut with this Id!");
 
-            return hut;
+            return Ok(hut);
         }
 
         // POST: /api/huts{body}

@@ -23,7 +23,7 @@ namespace BulgarianMountainTrails.Core.Services
             _validator = validator;
         }
 
-        public async Task<IEnumerable<HutDto>> GetAllHutsAsync(int? minAltitude, int? maxAltitude, int? minCapacity, int? maxCapacity, string? mountain)
+        public async Task<IEnumerable<HutDto>> GetAllAsync(int? minAltitude, int? maxAltitude, int? minCapacity, int? maxCapacity, string? mountain)
         {
             var query = FilterHuts(minAltitude, maxAltitude, mountain, minCapacity, maxCapacity);
 
@@ -35,17 +35,23 @@ namespace BulgarianMountainTrails.Core.Services
                 .ToListAsync();
         }
 
-        public Task<HutDto?> GetHutByIdAsync(Guid id)
+        public async Task<HutDto?> GetByIdAsync(Guid id)
+        {
+            var hut = await _context.Huts
+                .AsNoTracking()
+                .Include(t => t.TrailHuts)
+                .ThenInclude(th => th.Trail)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            return _mapper.Map<HutDto>(hut);
+        }
+
+        public Task<HutDto> CreateAsync(HutDto hutDto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<HutDto> CreateHutAsync(HutDto hutDto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteHutAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
             throw new NotImplementedException();
         }
