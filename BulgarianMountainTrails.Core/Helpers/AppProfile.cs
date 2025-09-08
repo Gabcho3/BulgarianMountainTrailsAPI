@@ -22,6 +22,8 @@ namespace BulgarianMountainTrails.Core.Helpers
             CreateMap<TrailDto, Trail>()
                 .ForMember(dest => dest.Difficulty,
                 opt => opt.MapFrom(src => Enum.Parse<Data.Enums.DifficultyEnum>(src.Difficulty, true)));
+
+            CreateMap<HutDto, Hut>();
         }
     }
 }

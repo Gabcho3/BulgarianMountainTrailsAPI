@@ -5,11 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
-
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using BulgarianMountainTrails.Data.Enums;
-
 
 namespace BulgarianMountainTrails.Core.Services
 {

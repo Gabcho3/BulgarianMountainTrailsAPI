@@ -3,7 +3,6 @@
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
-using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 
 namespace BulgarianMountainTrails.API.Controllers
@@ -12,13 +11,11 @@ namespace BulgarianMountainTrails.API.Controllers
     [ApiController]
     public class TrailsController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private ITrailService _service;
+        private readonly ITrailService _service;
 
-        public TrailsController(ITrailService service, ApplicationDbContext context)
+        public TrailsController(ITrailService service)
         {
             _service = service;
-            _context = context;
         }
 
         // GET: /api/trails?minHours=&maxHours=&difficulty=&mountain=&minKm=&maxKm=
@@ -74,7 +71,6 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
 
             return CreatedAtAction(nameof(GetTrail), new { id = trail.Id }, trail);
         }

@@ -15,12 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<ITrailService, TrailService>();
+builder.Services.AddScoped<IHutService, HutService>();
+builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();
+builder.Services.AddScoped<IValidator<HutDto>, HutDtoValidator>();
+
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AppProfile)));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();
 
 builder.Services.AddControllers();
 
