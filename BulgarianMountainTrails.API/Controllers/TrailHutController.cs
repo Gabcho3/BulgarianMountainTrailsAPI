@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -13,23 +14,32 @@ namespace BulgarianMountainTrails.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITrailHutService _service;
 
-        public TrailHutController(ApplicationDbContext context, IMapper mapper)
+        public TrailHutController(ApplicationDbContext context, IMapper mapper, ITrailHutService service)
         {
             _context = context;
             _mapper = mapper;
+            _service = service;
         }
 
         // GET: /api/trailhut/trail/{id}
         [HttpGet("trail/{trailId}")]
         public async Task<ActionResult> GetHutsForTrail(Guid trailId)
         {
-            var huts = await _context.TrailHuts
-                .Where(th => th.TrailId == trailId)
-                .Select(th => _mapper.Map<SimpleHutDto>(th.Hut))
-                .ToListAsync();
+            try
+            {
+                var huts = await _service.GetHutsForTrailAsync(trailId);
 
-            return Ok(huts);
+                if (!huts.Any())
+                    return NotFound("No Huts found for this Trail.");
+
+                return Ok(huts);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // GET: /api/trailhut/hut/{id}
@@ -46,8 +56,10 @@ namespace BulgarianMountainTrails.API.Controllers
 
         // POST: /api/trailhut/{body}
         [HttpPost]
-        public async Task<ActionResult> AddHutToTrail(TrailHut trailHut)
+        public async Task<ActionResult> AddHutToTrail(TrailHutDto trailHutDto)
         {
+            var trailHut = _mapper.Map<TrailHut>(trailHutDto);
+
             await _context.TrailHuts.AddAsync(trailHut);
             await _context.SaveChangesAsync();
 
@@ -56,8 +68,10 @@ namespace BulgarianMountainTrails.API.Controllers
 
         // DELETE: /api/trailhut/{body}
         [HttpDelete]
-        public async Task<ActionResult> DeleteHutToTrail(TrailHut trailHut)
+        public async Task<ActionResult> DeleteHutToTrail(TrailHutDto trailHutDto)
         {
+            var trailHut = _mapper.Map<TrailHut>(trailHutDto);
+
             _context.TrailHuts.Remove(trailHut);
             await _context.SaveChangesAsync();
 

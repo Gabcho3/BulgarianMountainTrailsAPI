@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BulgarianMountainTrails.Data.Entities
+﻿namespace BulgarianMountainTrails.Data.Entities
 {
     public class TrailHut
     {

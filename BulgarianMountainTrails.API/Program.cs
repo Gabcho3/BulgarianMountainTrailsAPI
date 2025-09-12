@@ -12,15 +12,20 @@ using BulgarianMountainTrails.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddScoped<ApplicationDbContext>();
+// Services
 builder.Services.AddScoped<ITrailService, TrailService>();
 builder.Services.AddScoped<IHutService, HutService>();
+builder.Services.AddScoped<ITrailHutService, TrailHutService>();
+
+// Validators
 builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();
 builder.Services.AddScoped<IValidator<HutDto>, HutDtoValidator>();
 
+// AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AppProfile)));
 
+// DbContext
+builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
