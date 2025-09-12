@@ -4,7 +4,6 @@ using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -65,12 +64,19 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpPost]
         public async Task<ActionResult> AddHutToTrail(TrailHutDto trailHutDto)
         {
-            var trailHut = _mapper.Map<TrailHut>(trailHutDto);
+            try
+            {
+                await _service.AddHutToTrailAsync(trailHutDto);
 
-            await _context.TrailHuts.AddAsync(trailHut);
-            await _context.SaveChangesAsync();
+                return Ok(trailHutDto);
+            }
+            catch (ArgumentException ex)
+            {
+                if (ex.Message == "Trail not found!" || ex.Message == "Hut not found!")
+                    return NotFound(ex.Message);
 
-            return Ok(trailHut);
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: /api/trailhut/{body}

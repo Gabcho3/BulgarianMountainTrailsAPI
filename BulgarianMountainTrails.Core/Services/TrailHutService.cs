@@ -50,9 +50,35 @@ namespace BulgarianMountainTrails.Core.Services
                 .ToListAsync();
         }
 
-        public Task AddHutToTrailAsync(TrailHutDto trailHutDto)
+        public async Task AddHutToTrailAsync(TrailHutDto trailHutDto)
         {
-            throw new NotImplementedException();
+            var trail = await _context.Trails.FindAsync(trailHutDto.TrailId);
+            var hut = await _context.Huts.FindAsync(trailHutDto.HutId);
+
+            if (trail == null )
+            {
+                throw new ArgumentException("Trail not found!");
+            }
+
+            if (hut == null)
+            {
+                throw new ArgumentException("Hut not found!");
+            }
+
+            var existingAssociation = await _context.TrailHuts
+                .AnyAsync(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
+
+            if (existingAssociation)
+            {
+                throw new ArgumentException("This Hut is already associated with the Trail!");
+            }
+
+            var trailHut = _mapper.Map<TrailHut>(trailHutDto);
+
+            await _context.TrailHuts.AddAsync(trailHut);
+            await _context.SaveChangesAsync();
+
+            return;
         }
 
         public Task RemoveHutFromTrailAsync(TrailHutDto trailHutDto)
