@@ -26,7 +26,7 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (trail == null)
             {
-                throw new ArgumentException("Trail not found!");
+                throw new KeyNotFoundException("Trail not found!");
             }
 
             return await _context.TrailHuts
@@ -41,7 +41,7 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (hut == null)
             {
-                throw new ArgumentException("Hut not found!");
+                throw new KeyNotFoundException("Hut not found!");
             }
 
             return await _context.TrailHuts
@@ -98,20 +98,20 @@ namespace BulgarianMountainTrails.Core.Services
             return;
         }
 
-        private async Task<IEnumerable<ArgumentException>> TrailHutExistsAsync(Guid trailId, Guid hutId)
+        private async Task<IEnumerable<KeyNotFoundException>> TrailHutExistsAsync(Guid trailId, Guid hutId)
         {
-            var errors = new List<ArgumentException>();
+            var errors = new List<KeyNotFoundException>();
 
             var trail = await _context.Trails.FindAsync(trailId);
             if (trail == null)
             {
-                errors.Add(new ArgumentException("Trail not found!"));
+                errors.Add(new KeyNotFoundException("Trail not found!"));
             }
 
             var hut = await _context.Huts.FindAsync(hutId);
             if (hut == null)
             {
-                errors.Add(new ArgumentException("Hut not found!"));
+                errors.Add(new KeyNotFoundException("Hut not found!"));
             }
 
             return errors;

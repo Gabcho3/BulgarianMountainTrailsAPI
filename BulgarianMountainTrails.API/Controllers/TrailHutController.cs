@@ -29,7 +29,7 @@ namespace BulgarianMountainTrails.API.Controllers
 
                 return Ok(huts);
             }
-            catch (ArgumentException ex)
+            catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -48,7 +48,7 @@ namespace BulgarianMountainTrails.API.Controllers
 
                 return Ok(trails);
             }
-            catch (ArgumentException ex)
+            catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
             }

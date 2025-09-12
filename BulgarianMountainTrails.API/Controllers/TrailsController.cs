@@ -4,6 +4,7 @@ using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
 using BulgarianMountainTrails.Data.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -67,7 +68,7 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 await _service.CreateAsync(trail);
             }
-            catch (ArgumentException ex)
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -83,7 +84,7 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 await _service.DeleteAsync(id);
             }
-            catch (ArgumentException ex)
+            catch (KeyNotFoundException ex)
             {
                 return BadRequest(ex.Message);
             }

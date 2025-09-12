@@ -54,7 +54,7 @@ namespace BulgarianMountainTrails.Core.Services
             if (!validationResult.IsValid)
             {
                 var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-                throw new ArgumentException($"Trail validation failed:\n{errors}");
+                throw new ValidationException($"Trail validation failed:\n{errors}");
             }
 
             var trail = _mapper.Map<Trail>(trailDto);
@@ -71,7 +71,7 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (trail == null)
             {
-                throw new ArgumentException("There is not a Trail with this Id!");
+                throw new KeyNotFoundException("Trail not found!");
             }
 
             _context.Remove(trail);

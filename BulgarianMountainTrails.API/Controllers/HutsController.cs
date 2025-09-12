@@ -4,6 +4,7 @@ using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
 using BulgarianMountainTrails.Data.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -41,9 +42,9 @@ namespace BulgarianMountainTrails.API.Controllers
 
                 return Ok(huts);
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                return BadRequest($"{ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -67,7 +68,7 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 await _service.CreateAsync(hut);
             }
-            catch (ArgumentException ex)
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -83,9 +84,9 @@ namespace BulgarianMountainTrails.API.Controllers
             {
                 await _service.DeleteAsync(id);
             }
-            catch (ArgumentException ex)
+            catch (KeyNotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
 
             return Ok("Successfully deleted!");

@@ -53,7 +53,7 @@ namespace BulgarianMountainTrails.Core.Services
             if (!validationResult.IsValid)
             {
                 var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-                throw new ArgumentException($"Hut validation failed:\n{errors}");
+                throw new ValidationException($"Hut validation failed:\n{errors}");
             }
 
             var hut = _mapper.Map<Hut>(hutDto);
@@ -70,7 +70,7 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (hut == null)
             {
-                throw new ArgumentException("There is not a Hut with this Id!");
+                throw new KeyNotFoundException("Hut not found!");
             }
 
             _context.Remove(hut);
