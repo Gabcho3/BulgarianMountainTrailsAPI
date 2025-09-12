@@ -68,7 +68,7 @@ namespace BulgarianMountainTrails.API.Controllers
             }
             catch (InvalidOperationException iex)
             {
-                return BadRequest(iex.Message);
+                return Conflict(iex.Message);
             }
 
             return Ok(trailHutDto);
