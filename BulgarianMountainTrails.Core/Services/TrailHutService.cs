@@ -25,14 +25,17 @@ namespace BulgarianMountainTrails.Core.Services
             var trail = await _context.Trails.FindAsync(trailId);
 
             if (trail == null)
-            {
                 throw new KeyNotFoundException("Trail not found!");
-            }
 
-            return await _context.TrailHuts
+            var huts = await _context.TrailHuts
                 .Where(th => th.TrailId == trailId)
                 .Select(th => _mapper.Map<SimpleHutDto>(th.Hut))
                 .ToListAsync();
+
+            if (huts.Count == 0)
+                throw new KeyNotFoundException("No Huts found for this Trail!");
+
+            return huts;
         }
 
         public async Task<IEnumerable<SimpleTrailDto>> GetTrailsForHutAsync(Guid hutId)
@@ -40,32 +43,28 @@ namespace BulgarianMountainTrails.Core.Services
             var hut = await _context.Huts.FindAsync(hutId);
 
             if (hut == null)
-            {
                 throw new KeyNotFoundException("Hut not found!");
-            }
 
-            return await _context.TrailHuts
+            var trails = await _context.TrailHuts
                 .Where(th => th.HutId == hutId)
                 .Select(th => _mapper.Map<SimpleTrailDto>(th.Trail))
                 .ToListAsync();
+
+            if (trails.Count == 0)
+                throw new KeyNotFoundException("No Trails found for this Hut!");
+
+            return trails;
         }
 
         public async Task AddHutToTrailAsync(TrailHutDto trailHutDto)
         {
-            var errors = await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
-
-            if (errors.Any())
-            {
-                throw new AggregateException(errors);
-            }
+            await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
 
             var existingAssociation = await _context.TrailHuts
-            .AnyAsync(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
+                .AnyAsync(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
 
             if (existingAssociation)
-            {
                 throw new InvalidOperationException("This Hut is already associated with the Trail!");
-            }
 
             var trailHut = _mapper.Map<TrailHut>(trailHutDto);
 
@@ -77,20 +76,13 @@ namespace BulgarianMountainTrails.Core.Services
 
         public async Task RemoveHutFromTrailAsync(TrailHutDto trailHutDto)
         {
-            var errors = await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
-
-            if (errors.Any())
-            {
-                throw new AggregateException(errors);
-            }
+            await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
 
             var trailHut = _context.TrailHuts
                 .FirstOrDefault(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
 
             if (trailHut == null)
-            {
                 throw new ArgumentException("This Hut is not associated with the Trail!");
-            }
 
             _context.TrailHuts.Remove(trailHut);
             await _context.SaveChangesAsync();
@@ -98,23 +90,17 @@ namespace BulgarianMountainTrails.Core.Services
             return;
         }
 
-        private async Task<IEnumerable<KeyNotFoundException>> TrailHutExistsAsync(Guid trailId, Guid hutId)
+        private async Task TrailHutExistsAsync(Guid trailId, Guid hutId)
         {
-            var errors = new List<KeyNotFoundException>();
-
             var trail = await _context.Trails.FindAsync(trailId);
             if (trail == null)
-            {
-                errors.Add(new KeyNotFoundException("Trail not found!"));
-            }
+                throw new KeyNotFoundException("Trail not found!");
 
             var hut = await _context.Huts.FindAsync(hutId);
             if (hut == null)
-            {
-                errors.Add(new KeyNotFoundException("Hut not found!"));
-            }
+                throw new KeyNotFoundException("Hut not found!");
 
-            return errors;
+            return;
         }
     }
 }

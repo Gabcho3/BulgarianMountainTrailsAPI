@@ -30,22 +30,12 @@ namespace BulgarianMountainTrails.API.Controllers
             var invalidKeys = queryKeys.Except(allowedKeys, StringComparer.OrdinalIgnoreCase);
             if (invalidKeys.Any())
             {
-                return BadRequest($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
+                throw new ArgumentException($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
             }
 
-            try
-            {
-                var huts = await _service.GetAllAsync(minAltitude, maxAltitude, minCapacity, maxCapacity, mountain);
-
-                if (!huts.Any())
-                    return NotFound("No huts found matching the criteria.");
-
-                return Ok(huts);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var huts = await _service.GetAllAsync(minAltitude, maxAltitude, minCapacity, maxCapacity, mountain);
+            return Ok(huts);
+            
         }
 
         // GET: /api/huts/{id}
@@ -53,10 +43,6 @@ namespace BulgarianMountainTrails.API.Controllers
         public async Task<ActionResult<Hut>> GetHut(Guid id)
         {
             var hut = await _service.GetByIdAsync(id);
-
-            if (hut == null)
-                return NotFound("There is not a Hut with this Id!");
-
             return Ok(hut);
         }
 
@@ -64,15 +50,7 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpPost]
         public async Task<ActionResult<HutDto>> PostHut(HutDto hut)
         {
-            try
-            {
-                await _service.CreateAsync(hut);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            await _service.CreateAsync(hut);
             return CreatedAtAction(nameof(GetHut), new { id = hut.Id }, hut);
         }
 
@@ -80,15 +58,7 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHut(Guid id)
         {
-            try
-            {
-                await _service.DeleteAsync(id);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-
+            await _service.DeleteAsync(id);
             return Ok("Successfully deleted!");
         }
     }

@@ -28,12 +28,17 @@ namespace BulgarianMountainTrails.Core.Services
         {
             var query = FilterTrails(minHours, maxHours, minKm, maxKm, mountain, difficulty);
 
-            return await query
+            var trails = await query
                 .AsNoTracking()
                 .Include(t => t.TrailHuts)
                 .ThenInclude(th => th.Hut)
                 .Select(t => _mapper.Map<TrailDto>(t))
                 .ToListAsync();
+
+            if (trails.Count == 0)
+                throw new KeyNotFoundException("No trails found matching the criteria!");
+
+            return trails;
         }
 
         public async Task<TrailDto?> GetByIdAsync(Guid id)
@@ -43,6 +48,9 @@ namespace BulgarianMountainTrails.Core.Services
                 .Include(t => t.TrailHuts)
                 .ThenInclude(th => th.Hut)
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trail == null)
+                throw new KeyNotFoundException("Trail not found!");
 
             return _mapper.Map<TrailDto>(trail);
         }
@@ -54,7 +62,7 @@ namespace BulgarianMountainTrails.Core.Services
             if (!validationResult.IsValid)
             {
                 var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-                throw new ValidationException($"Trail validation failed:\n{errors}");
+                throw new ArgumentException($"Trail validation failed:\n{errors}");
             }
 
             var trail = _mapper.Map<Trail>(trailDto);

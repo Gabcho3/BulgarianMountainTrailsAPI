@@ -1,14 +1,12 @@
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Helpers;
 using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Core.Services;
 using BulgarianMountainTrails.Core.Validations;
-
 using BulgarianMountainTrails.Data;
+using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,16 +39,43 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
+    //app.UseDeveloperExceptionPage();
 }
 
-else
+app.UseExceptionHandler(errorApp =>
 {
-    app.UseExceptionHandler("/error");
-    app.UseHsts();
-}
+    errorApp.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
 
- app.UseHttpsRedirection();
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        if (exception == null)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsJsonAsync(new { message = "An unexpected error occurred." });
+            return;
+        }
+
+        context.Response.StatusCode = exception switch
+        {
+            ArgumentException => StatusCodes.Status400BadRequest,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+            InvalidOperationException => StatusCodes.Status409Conflict,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = exception.Message
+        });
+    });
+});
+
+app.UseHsts();
+
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

@@ -4,7 +4,6 @@ using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
 using BulgarianMountainTrails.Data.Entities;
-using System.ComponentModel.DataAnnotations;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -30,22 +29,11 @@ namespace BulgarianMountainTrails.API.Controllers
             var invalidKeys = queryKeys.Except(allowedKeys, StringComparer.OrdinalIgnoreCase);
             if (invalidKeys.Any())
             {
-                return BadRequest($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
+                throw new ArgumentException($"Invalid query parameters: {string.Join(", ", invalidKeys)}");
             }
 
-            try
-            {
-                var trails = await _service.GetAllAsync(minHours, maxHours, minKm, maxKm, difficulty, mountain);
-
-                if (!trails.Any())
-                    return NotFound("No trails found matching the criteria.");
-
-                return Ok(trails);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var trails = await _service.GetAllAsync(minHours, maxHours, minKm, maxKm, difficulty, mountain);
+            return Ok(trails);
         }
 
         // GET: /api/trails/{id}
@@ -53,10 +41,6 @@ namespace BulgarianMountainTrails.API.Controllers
         public async Task<ActionResult<Trail>> GetTrail(Guid id)
         {
             var trail = await _service.GetByIdAsync(id);
-
-            if (trail == null)
-                return NotFound("There is not a Trail with this Id!");
-
             return Ok(trail);
         }
 
@@ -64,15 +48,7 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpPost]
         public async Task<ActionResult<TrailDto>> PostTrail(TrailDto trail)
         {
-            try
-            {
-                await _service.CreateAsync(trail);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            await _service.CreateAsync(trail);
             return CreatedAtAction(nameof(GetTrail), new { id = trail.Id }, trail);
         }
 
@@ -80,15 +56,7 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrail(Guid id)
         {
-            try
-            {
-                await _service.DeleteAsync(id);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            await _service.DeleteAsync(id);
             return Ok("Successfully deleted!");
         }
     }

@@ -2,9 +2,11 @@
 
 namespace BulgarianMountainTrails.API.Controllers
 {
+    [ApiController]
+    [Route("error")]
     public class ErrorController : ControllerBase
     {
-        [Route("error")]
+        [HttpGet]
         public IActionResult HandleError() =>
         Problem(statusCode: 500, title: "Unexpected error occurred.");
     }

@@ -20,57 +20,23 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpGet("trail/{trailId}")]
         public async Task<ActionResult> GetHutsForTrail(Guid trailId)
         {
-            try
-            {
-                var huts = await _service.GetHutsForTrailAsync(trailId);
-
-                if (!huts.Any())
-                    return NotFound("No Huts found for this Trail!");
-
-                return Ok(huts);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var huts = await _service.GetHutsForTrailAsync(trailId);
+            return Ok(huts);
         }
 
         // GET: /api/trailhut/hut/{id}
         [HttpGet("hut/{hutId}")]
         public async Task<ActionResult> GetTrailsForHut(Guid hutId)
         {
-            try
-            {
-                var trails = await _service.GetTrailsForHutAsync(hutId);
-
-                if (!trails.Any())
-                    return NotFound("No Trails found for this Hut!");
-
-                return Ok(trails);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var trails = await _service.GetTrailsForHutAsync(hutId);
+            return Ok(trails);
         }
 
         // POST: /api/trailhut/{body}
         [HttpPost]
         public async Task<ActionResult> AddHutToTrail(TrailHutDto trailHutDto)
         {
-            try
-            {
-                await _service.AddHutToTrailAsync(trailHutDto);
-            }
-            catch (AggregateException aex)
-            {
-                return NotFound(String.Join("\n", aex.InnerExceptions.Select(iex => iex.Message)));
-            }
-            catch (InvalidOperationException iex)
-            {
-                return Conflict(iex.Message);
-            }
-
+            await _service.AddHutToTrailAsync(trailHutDto);
             return Ok(trailHutDto);
         }
 
@@ -78,19 +44,7 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpDelete]
         public async Task<ActionResult> DeleteHutToTrail(TrailHutDto trailHutDto)
         {
-            try
-            {
-                await _service.RemoveHutFromTrailAsync(trailHutDto);
-            }
-            catch (AggregateException aex)
-            {
-                return NotFound(String.Join("\n", aex.InnerExceptions.Select(iex => iex.Message)));
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            await _service.RemoveHutFromTrailAsync(trailHutDto);
             return Ok("Hut is successfully removed from the Trail!");
         }
     }

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using FluentValidation;
-
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
-
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace BulgarianMountainTrails.Core.Services
 {
@@ -27,12 +27,17 @@ namespace BulgarianMountainTrails.Core.Services
         {
             var query = FilterHuts(minAltitude, maxAltitude, mountain, minCapacity, maxCapacity);
 
-            return await query
+            var huts = await query
                 .AsNoTracking()
                 .Include(h => h.TrailHuts)
                 .ThenInclude(th => th.Trail)
                 .Select(h => _mapper.Map<HutDto>(h))
                 .ToListAsync();
+
+            if (huts.Count == 0)
+                throw new KeyNotFoundException("No huts found matching the criteria!");
+
+            return huts;
         }
 
         public async Task<HutDto?> GetByIdAsync(Guid id)
@@ -42,6 +47,9 @@ namespace BulgarianMountainTrails.Core.Services
                 .Include(t => t.TrailHuts)
                 .ThenInclude(th => th.Trail)
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (hut == null)
+                throw new KeyNotFoundException("Hut not found!");
 
             return _mapper.Map<HutDto>(hut);
         }
@@ -53,7 +61,7 @@ namespace BulgarianMountainTrails.Core.Services
             if (!validationResult.IsValid)
             {
                 var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-                throw new ValidationException($"Hut validation failed:\n{errors}");
+                throw new ArgumentException($"Hut validation failed:\n{errors}");
             }
 
             var hut = _mapper.Map<Hut>(hutDto);
@@ -69,9 +77,7 @@ namespace BulgarianMountainTrails.Core.Services
             var hut = await _context.Huts.FindAsync(id);
 
             if (hut == null)
-            {
                 throw new KeyNotFoundException("Hut not found!");
-            }
 
             _context.Remove(hut);
             await _context.SaveChangesAsync();
