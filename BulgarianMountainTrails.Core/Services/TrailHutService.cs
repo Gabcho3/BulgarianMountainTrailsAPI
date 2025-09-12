@@ -4,6 +4,7 @@ using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
 using BulgarianMountainTrails.Data;
+using BulgarianMountainTrails.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BulgarianMountainTrails.Core.Services
@@ -25,7 +26,7 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (trail == null)
             {
-                throw new ArgumentException("Trail not found");
+                throw new ArgumentException("Trail not found!");
             }
 
             return await _context.TrailHuts
@@ -34,9 +35,19 @@ namespace BulgarianMountainTrails.Core.Services
                 .ToListAsync();
         }
 
-        public Task<IEnumerable<SimpleTrailDto>> GetTrailsForHutAsync(Guid hutId)
+        public async Task<IEnumerable<SimpleTrailDto>> GetTrailsForHutAsync(Guid hutId)
         {
-            throw new NotImplementedException();
+            var hut = await _context.Huts.FindAsync(hutId);
+
+            if (hut == null)
+            {
+                throw new ArgumentException("Hut not found!");
+            }
+
+            return await _context.TrailHuts
+                .Where(th => th.HutId == hutId)
+                .Select(th => _mapper.Map<SimpleTrailDto>(th.Trail))
+                .ToListAsync();
         }
 
         public Task AddHutToTrailAsync(TrailHutDto trailHutDto)

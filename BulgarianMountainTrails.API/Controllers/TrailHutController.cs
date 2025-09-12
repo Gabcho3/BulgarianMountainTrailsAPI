@@ -32,7 +32,7 @@ namespace BulgarianMountainTrails.API.Controllers
                 var huts = await _service.GetHutsForTrailAsync(trailId);
 
                 if (!huts.Any())
-                    return NotFound("No Huts found for this Trail.");
+                    return NotFound("No Huts found for this Trail!");
 
                 return Ok(huts);
             }
@@ -46,12 +46,19 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpGet("hut/{hutId}")]
         public async Task<ActionResult> GetTrailsForHut(Guid hutId)
         {
-            var trails = await _context.TrailHuts
-                .Where(th => th.HutId == hutId)
-                .Select(th => _mapper.Map<SimpleTrailDto>(th.Trail))
-                .ToListAsync();
+            try
+            {
+                var trails = await _service.GetTrailsForHutAsync(hutId);
 
-            return Ok(trails);
+                if (!trails.Any())
+                    return NotFound("No Trails found for this Hut!");
+
+                return Ok(trails);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // POST: /api/trailhut/{body}
