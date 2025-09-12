@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BulgarianMountainTrails.Core.Services
 {
@@ -52,25 +52,19 @@ namespace BulgarianMountainTrails.Core.Services
 
         public async Task AddHutToTrailAsync(TrailHutDto trailHutDto)
         {
-            var trail = await _context.Trails.FindAsync(trailHutDto.TrailId);
-            var hut = await _context.Huts.FindAsync(trailHutDto.HutId);
+            var errors = await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
 
-            if (trail == null )
+            if (errors.Any())
             {
-                throw new ArgumentException("Trail not found!");
-            }
-
-            if (hut == null)
-            {
-                throw new ArgumentException("Hut not found!");
+                throw new AggregateException(errors);
             }
 
             var existingAssociation = await _context.TrailHuts
-                .AnyAsync(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
+            .AnyAsync(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
 
             if (existingAssociation)
             {
-                throw new ArgumentException("This Hut is already associated with the Trail!");
+                throw new InvalidOperationException("This Hut is already associated with the Trail!");
             }
 
             var trailHut = _mapper.Map<TrailHut>(trailHutDto);
@@ -81,9 +75,46 @@ namespace BulgarianMountainTrails.Core.Services
             return;
         }
 
-        public Task RemoveHutFromTrailAsync(TrailHutDto trailHutDto)
+        public async Task RemoveHutFromTrailAsync(TrailHutDto trailHutDto)
         {
-            throw new NotImplementedException();
+            var errors = await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
+
+            if (errors.Any())
+            {
+                throw new AggregateException(errors);
+            }
+
+            var trailHut = _context.TrailHuts
+                .FirstOrDefault(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
+
+            if (trailHut == null)
+            {
+                throw new ArgumentException("This Hut is not associated with the Trail!");
+            }
+
+            _context.TrailHuts.Remove(trailHut);
+            await _context.SaveChangesAsync();
+
+            return;
+        }
+
+        private async Task<IEnumerable<ArgumentException>> TrailHutExistsAsync(Guid trailId, Guid hutId)
+        {
+            var errors = new List<ArgumentException>();
+
+            var trail = await _context.Trails.FindAsync(trailId);
+            if (trail == null)
+            {
+                errors.Add(new ArgumentException("Trail not found!"));
+            }
+
+            var hut = await _context.Huts.FindAsync(hutId);
+            if (hut == null)
+            {
+                errors.Add(new ArgumentException("Hut not found!"));
+            }
+
+            return errors;
         }
     }
 }

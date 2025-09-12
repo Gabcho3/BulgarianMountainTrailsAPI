@@ -1,9 +1,7 @@
-﻿using AutoMapper;
+﻿using Microsoft.AspNetCore.Mvc;
+
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
-using BulgarianMountainTrails.Data;
-using BulgarianMountainTrails.Data.Entities;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -11,14 +9,10 @@ namespace BulgarianMountainTrails.API.Controllers
     [ApiController]
     public class TrailHutController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ITrailHutService _service;
 
-        public TrailHutController(ApplicationDbContext context, IMapper mapper, ITrailHutService service)
+        public TrailHutController(ITrailHutService service)
         {
-            _context = context;
-            _mapper = mapper;
             _service = service;
         }
 
@@ -67,28 +61,37 @@ namespace BulgarianMountainTrails.API.Controllers
             try
             {
                 await _service.AddHutToTrailAsync(trailHutDto);
-
-                return Ok(trailHutDto);
             }
-            catch (ArgumentException ex)
+            catch (AggregateException aex)
             {
-                if (ex.Message == "Trail not found!" || ex.Message == "Hut not found!")
-                    return NotFound(ex.Message);
-
-                return BadRequest(ex.Message);
+                return NotFound(String.Join("\n", aex.InnerExceptions.Select(iex => iex.Message)));
             }
+            catch (InvalidOperationException iex)
+            {
+                return BadRequest(iex.Message);
+            }
+
+            return Ok(trailHutDto);
         }
 
         // DELETE: /api/trailhut/{body}
         [HttpDelete]
         public async Task<ActionResult> DeleteHutToTrail(TrailHutDto trailHutDto)
         {
-            var trailHut = _mapper.Map<TrailHut>(trailHutDto);
+            try
+            {
+                await _service.RemoveHutFromTrailAsync(trailHutDto);
+            }
+            catch (AggregateException aex)
+            {
+                return NotFound(String.Join("\n", aex.InnerExceptions.Select(iex => iex.Message)));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            _context.TrailHuts.Remove(trailHut);
-            await _context.SaveChangesAsync();
-
-            return Ok(trailHut);
+            return Ok("Hut is successfully removed from the Trail!");
         }
     }
 }
