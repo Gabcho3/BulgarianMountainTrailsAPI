@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Core.Helpers;
 using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace BulgarianMountainTrails.Core.Services
 {
@@ -60,8 +59,18 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (!validationResult.IsValid)
             {
-                var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-                throw new ArgumentException($"Hut validation failed:\n{errors}");
+                var errors = new List<ApiError>();
+
+                foreach (var error in validationResult.Errors)
+                {
+                    errors.Add(new ApiError
+                    {
+                        Field = error.PropertyName,
+                        Message = error.ErrorMessage
+                    });
+                }
+
+                throw new ApiException(errors);
             }
 
             var hut = _mapper.Map<Hut>(hutDto);
@@ -87,11 +96,16 @@ namespace BulgarianMountainTrails.Core.Services
 
         private IQueryable<Hut> FilterHuts(int? minAltitude, int? maxAltitude, string? mountain, int? minCapacity, int? maxCapacity)
         {
+            var errors = new List<ApiError>();
+
             if (minAltitude > maxAltitude)
-                throw new ArgumentException("MinAltitude cannot be greater than MaxAltitude!");
+                errors.Add(new ApiError { Field = "Altitude", Message = "MinAltitude cannot be greater than MaxAltitude!" });
 
             if (minCapacity > maxCapacity)
-                throw new ArgumentException("MinCapacity cannot be greater than MaxCapacity!");
+                errors.Add(new ApiError { Field = "Capacity", Message = "MinCapacity cannot be greater than Capacity!" });
+
+            if (errors.Count > 0)
+                throw new ApiException(errors);
 
             var query = _context.Huts.AsNoTracking().AsQueryable();
 

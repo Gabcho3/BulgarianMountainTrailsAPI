@@ -7,6 +7,8 @@ using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 
+using BulgarianMountainTrails.Core.Helpers;
+
 namespace BulgarianMountainTrails.Core.Services
 {
     public class TrailHutService : ITrailHutService
@@ -92,13 +94,18 @@ namespace BulgarianMountainTrails.Core.Services
 
         private async Task TrailHutExistsAsync(Guid trailId, Guid hutId)
         {
+            var errors = new List<ApiError>();
+
             var trail = await _context.Trails.FindAsync(trailId);
             if (trail == null)
-                throw new KeyNotFoundException("Trail not found!");
+               errors.Add(new() { Field = "Trail", Message = "Trail not found!" });
 
             var hut = await _context.Huts.FindAsync(hutId);
             if (hut == null)
-                throw new KeyNotFoundException("Hut not found!");
+                errors.Add(new() { Field = "Hut", Message = "Hut not found!" });
+
+            if (errors.Count > 0)
+                throw new ApiException(errors);
 
             return;
         }

@@ -9,6 +9,8 @@ using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using BulgarianMountainTrails.Data.Enums;
 
+using BulgarianMountainTrails.Core.Helpers;
+
 namespace BulgarianMountainTrails.Core.Services
 {
     public class TrailService : ITrailService
@@ -61,8 +63,18 @@ namespace BulgarianMountainTrails.Core.Services
 
             if (!validationResult.IsValid)
             {
-                var errors = string.Join("\n", validationResult.Errors.Select(e => e.ErrorMessage));
-                throw new ArgumentException($"Trail validation failed:\n{errors}");
+                var errors = new List<ApiError>();
+
+                foreach (var error in validationResult.Errors)
+                {
+                    errors.Add(new ApiError
+                    {
+                        Field = error.PropertyName,
+                        Message = error.ErrorMessage
+                    });
+                }
+
+                throw new ApiException(errors);
             }
 
             var trail = _mapper.Map<Trail>(trailDto);
@@ -90,11 +102,13 @@ namespace BulgarianMountainTrails.Core.Services
 
         private IQueryable<Trail> FilterTrails(double? minHours, double? maxHours, double? minKm, double? maxKm, string? mountain, string? difficulty)
         {
+            var errors = new List<ApiError>();
+
             if (minHours > maxHours)
-                throw new ArgumentException("MinHours cannot be greater than MaxHours!");
+                errors.Add(new() { Field = "Hours", Message = "MinHours cannot be greater than MaxHours!" });
 
             if (minKm > maxKm)
-                throw new ArgumentException("MinKm cannot be greater than MaxKm!");
+                errors.Add(new() { Field = "Km", Message = "MinKm cannot be greater than MaxKm!}" });
 
             var query = _context.Trails.AsNoTracking().AsQueryable();
 
@@ -103,8 +117,10 @@ namespace BulgarianMountainTrails.Core.Services
                 bool isValidDifficulty = Enum.TryParse<DifficultyEnum>(difficulty, out var difficultyEnum);
 
                 if (!isValidDifficulty || !Enum.IsDefined(typeof(DifficultyEnum), difficultyEnum))
-                    throw new ArgumentException("Invalid Difficulty Level!\n" +
-                        "The valid values are: Unknown, Easy, Medium, Hard");
+                    errors.Add(new() { Field = "Difficulty Level", Message = "Invalid Difficulty Level! The valid values are: Unknown, Easy, Medium, Hard" });
+
+                if(errors.Count > 0)
+                    throw new ApiException(errors);
 
                 query = query.Where(t => t.Difficulty == difficultyEnum);
             }

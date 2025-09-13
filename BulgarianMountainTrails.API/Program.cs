@@ -56,6 +56,17 @@ app.UseExceptionHandler(errorApp =>
             await context.Response.WriteAsJsonAsync(new { message = "An unexpected error occurred." });
             return;
         }
+        
+        if(exception is ApiException apiEx)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                message = exception.Message,
+                errors = apiEx.Errors
+            });
+            return;
+        }
 
         context.Response.StatusCode = exception switch
         {
