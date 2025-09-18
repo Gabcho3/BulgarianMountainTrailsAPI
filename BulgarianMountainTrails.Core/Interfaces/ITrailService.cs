@@ -1,5 +1,4 @@
 ﻿using BulgarianMountainTrails.Core.DTOs;
-using BulgarianMountainTrails.Data.Entities;
 
 namespace BulgarianMountainTrails.Core.Interfaces
 {

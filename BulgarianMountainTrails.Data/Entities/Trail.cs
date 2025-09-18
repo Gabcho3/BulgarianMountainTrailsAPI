@@ -10,6 +10,7 @@ namespace BulgarianMountainTrails.Data.Entities
         {
             Id = Guid.NewGuid();
             TrailHuts = new List<TrailHut>();
+            TrailPOIs = new List<TrailPOI>();
         }
 
         [Key]
@@ -41,5 +42,7 @@ namespace BulgarianMountainTrails.Data.Entities
         public string? Description { get; set; }
 
         public ICollection<TrailHut> TrailHuts { get; set; }
+
+        public ICollection<TrailPOI> TrailPOIs { get; set; }
     }
 }
