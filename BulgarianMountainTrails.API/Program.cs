@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ITrailService, TrailService>();
 builder.Services.AddScoped<IHutService, HutService>();
 builder.Services.AddScoped<ITrailHutService, TrailHutService>();
+builder.Services.AddScoped<IPoiService, PoiService>();
 
 // Validators
 builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();

@@ -11,7 +11,8 @@ namespace BulgarianMountainTrails.Core.Helpers
             CreateMap<Trail, TrailDto>()
                 .ForMember(dest => dest.Difficulty,
                 opt => opt.MapFrom(src => src.Difficulty.ToString()))
-                .ForMember(dest => dest.Huts, opt => opt.MapFrom(opt => opt.TrailHuts.Select(th => th.Hut)));
+                .ForMember(dest => dest.Huts, opt => opt.MapFrom(opt => opt.TrailHuts.Select(th => th.Hut)))
+                .ForMember(dest => dest.PointsOfInterest, opt => opt.MapFrom(opt => opt.TrailPOIs.Select(tp => tp.PointOfInterest)));
 
             CreateMap<Hut, HutDto>()
                 .ForMember(dest => dest.Trails, opt => opt.MapFrom(opt => opt.TrailHuts.Select(th => th.Trail)));
