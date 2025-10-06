@@ -21,14 +21,18 @@ namespace BulgarianMountainTrails.Core.Services
 
         public async Task<IEnumerable<PointOfInterest>> GetPOIsForTrailAsync(Guid trailId)
         {
+            var trailExists = await _context.Trails
+                .AsNoTracking()
+                .AnyAsync(t => t.Id == trailId);
+
+            if (!trailExists)
+                throw new KeyNotFoundException("Trail not found!");
+
             var pois = await _context.TrailPOIs
                 .AsNoTracking()
                 .Where(tp => tp.TrailId == trailId)
                 .Select(tp => tp.PointOfInterest)
                 .ToListAsync();
-
-            if (pois == null)
-                throw new KeyNotFoundException("Trail not found!");
 
             if (pois.Count == 0)
                 throw new KeyNotFoundException("No POIs found for the specified trail!");
