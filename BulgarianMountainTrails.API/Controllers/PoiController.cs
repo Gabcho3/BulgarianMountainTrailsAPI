@@ -15,18 +15,17 @@ namespace BulgarianMountainTrails.API.Controllers
             _poiService = poiService;
         }
 
-        [HttpGet("trail/{trailId}")]
-        public async Task<IActionResult> GetPOIsForTrail(Guid trailId)
+        [HttpGet]
+        public async Task<IActionResult> GetAllPOIs([FromQuery] string? type)
         {
-            var pois = await _poiService.GetPOIsForTrailAsync(trailId);
+            var pois = await _poiService.GetAllPOIsAsync(type);
             return Ok(pois);
         }
 
-        [HttpGet("trail/{trailId}/type/{type}")]
-        public async Task<IActionResult> GetPoisForTrailByType(Guid trailId, string type)
+        [HttpGet("trail/{trailId}")]
+        public async Task<IActionResult> GetPOIsForTrail(Guid trailId, [FromQuery] string? type)
         {
-            var pois = await _poiService.GetPoisForTrailByTypeAsync(trailId, type);
-
+            var pois = await _poiService.GetPOIsForTrailAsync(trailId, type);
             return Ok(pois);
         }
     }
