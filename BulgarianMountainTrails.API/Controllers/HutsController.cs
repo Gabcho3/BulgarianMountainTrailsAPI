@@ -4,11 +4,10 @@ using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
 
 using BulgarianMountainTrails.Data.Entities;
-using System.ComponentModel.DataAnnotations;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/huts")]
     [ApiController]
     public class HutsController : Controller
     {

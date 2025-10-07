@@ -43,6 +43,18 @@ namespace BulgarianMountainTrails.Core.Services
             return pois;
         }
 
+        public async Task<PointOfInterest> GetPOIByIdAsync(Guid id)
+        {
+            var poi = await _context.PointsOfInterest
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (poi == null)
+                throw new KeyNotFoundException("POI not found!");
+
+            return poi!;
+        }
+
         public async Task<IEnumerable<PointOfInterest>> GetPOIsForTrailAsync(Guid trailId, string? type)
         {
             var trailExists = await _context.Trails
@@ -76,5 +88,10 @@ namespace BulgarianMountainTrails.Core.Services
 
             return pois;
         }
+
+        //public Task<PointOfInterest> CreatePOIAsync(PointOfInterest poi)
+        //{
+            
+        //}
     }
 }

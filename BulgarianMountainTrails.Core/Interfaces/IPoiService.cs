@@ -6,6 +6,10 @@ namespace BulgarianMountainTrails.Core.Interfaces
     {
         Task<IEnumerable<PointOfInterest>> GetAllPOIsAsync(string? type);
 
+        Task<PointOfInterest> GetPOIByIdAsync(Guid id);
+
+        //Task<PointOfInterest> CreatePOIAsync(PointOfInterest poi);
+
         Task<IEnumerable<PointOfInterest>> GetPOIsForTrailAsync(Guid trailId, string? type);
     }
 }

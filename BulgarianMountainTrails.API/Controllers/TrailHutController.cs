@@ -5,7 +5,7 @@ using BulgarianMountainTrails.Core.Interfaces;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/trailHut")]
     [ApiController]
     public class TrailHutController : ControllerBase
     {

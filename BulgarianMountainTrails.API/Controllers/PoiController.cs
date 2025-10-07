@@ -4,7 +4,7 @@ using BulgarianMountainTrails.Core.Interfaces;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/poi")]
     [ApiController]
     public class PoiController : Controller
     {
@@ -21,6 +21,22 @@ namespace BulgarianMountainTrails.API.Controllers
             var pois = await _poiService.GetAllPOIsAsync(type);
             return Ok(pois);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPOIById(Guid id)
+        {
+            var poi = await _poiService.GetPOIByIdAsync(id);
+
+            return Ok(poi);
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CreatePOI(PointOfInterest poi)
+        //{
+        //    var createdPoi = await _poiService.CreatePOIAsync(poi);
+
+        //    return CreatedAtAction(nameof(GetPOIById), new { id = createdPoi.Id }, createdPoi);
+        //}
 
         [HttpGet("trail/{trailId}")]
         public async Task<IActionResult> GetPOIsForTrail(Guid trailId, [FromQuery] string? type)

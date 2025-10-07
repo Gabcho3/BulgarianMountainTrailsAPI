@@ -7,7 +7,7 @@ using BulgarianMountainTrails.Data.Entities;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/trails")]
     [ApiController]
     public class TrailsController : Controller
     {
