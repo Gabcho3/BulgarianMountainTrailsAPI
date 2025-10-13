@@ -1,4 +1,5 @@
-﻿using BulgarianMountainTrails.Data.Entities;
+﻿using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Data.Entities;
 
 namespace BulgarianMountainTrails.Core.Interfaces
 {
@@ -8,7 +9,7 @@ namespace BulgarianMountainTrails.Core.Interfaces
 
         Task<PointOfInterest> GetPOIByIdAsync(Guid id);
 
-        //Task<PointOfInterest> CreatePOIAsync(PointOfInterest poi);
+        Task CreatePOIAsync(PoiDto dto);
 
         Task<IEnumerable<PointOfInterest>> GetPOIsForTrailAsync(Guid trailId, string? type);
     }

@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
+using BulgarianMountainTrails.Data.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BulgarianMountainTrails.API.Controllers
 {
@@ -15,6 +16,7 @@ namespace BulgarianMountainTrails.API.Controllers
             _poiService = poiService;
         }
 
+        //GET: /api/poi?type=
         [HttpGet]
         public async Task<IActionResult> GetAllPOIs([FromQuery] string? type)
         {
@@ -22,6 +24,7 @@ namespace BulgarianMountainTrails.API.Controllers
             return Ok(pois);
         }
 
+        //GET: /api/poi/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPOIById(Guid id)
         {
@@ -30,14 +33,16 @@ namespace BulgarianMountainTrails.API.Controllers
             return Ok(poi);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreatePOI(PointOfInterest poi)
-        //{
-        //    var createdPoi = await _poiService.CreatePOIAsync(poi);
+        // POST: /api/poi
+        [HttpPost]
+        public async Task<IActionResult> CreatePOI(PoiDto dto)
+        {
+            await _poiService.CreatePOIAsync(dto);
 
-        //    return CreatedAtAction(nameof(GetPOIById), new { id = createdPoi.Id }, createdPoi);
-        //}
+            return CreatedAtAction(nameof(GetPOIById), new { id = dto.Id }, dto);
+        }
 
+        // GET: /api/poi/trail/{trailId}?type=
         [HttpGet("trail/{trailId}")]
         public async Task<IActionResult> GetPOIsForTrail(Guid trailId, [FromQuery] string? type)
         {

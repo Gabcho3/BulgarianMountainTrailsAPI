@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+using BulgarianMountainTrails.Core.DTOs;
+using BulgarianMountainTrails.Core.Helpers;
 using BulgarianMountainTrails.Core.Interfaces;
+
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using BulgarianMountainTrails.Data.Enums;
-using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BulgarianMountainTrails.Core.Services
 {
@@ -11,11 +17,13 @@ namespace BulgarianMountainTrails.Core.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IValidator<PointOfInterest> _validator;
 
-        public PoiService(ApplicationDbContext context, IMapper mapper)
+        public PoiService(ApplicationDbContext context, IMapper mapper, IValidator<PointOfInterest> validator)
         {
             _context = context;
             _mapper = mapper;
+            _validator = validator;
         }
 
         public async Task<IEnumerable<PointOfInterest>> GetAllPOIsAsync(string? type)
@@ -34,7 +42,7 @@ namespace BulgarianMountainTrails.Core.Services
                     throw new ArgumentException($"Invalid POI type '{type}'. Valid types are: {string.Join(", ", Enum.GetNames(typeof(PoiType)))}");
                 }
 
-                pois.Where(p => p.GetType().Name.Equals(type, StringComparison.OrdinalIgnoreCase));
+                pois = pois.Where(p => p.GetType().Name.Equals(type, StringComparison.OrdinalIgnoreCase)).ToList();
 
                 if (pois.Count == 0)
                     throw new KeyNotFoundException($"No POIs of type '{type}' found!");
@@ -89,9 +97,51 @@ namespace BulgarianMountainTrails.Core.Services
             return pois;
         }
 
-        //public Task<PointOfInterest> CreatePOIAsync(PointOfInterest poi)
-        //{
-            
-        //}
+        public async Task CreatePOIAsync(PoiDto dto)
+        {
+          if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "POI data is required!");
+
+            PointOfInterest poi;
+            try
+            {
+                poi = dto.Type.ToLower() switch
+                {
+                    "river" => _mapper.Map<River>(dto),
+                    "lake" => _mapper.Map<Lake>(dto),
+                    "waterfall" => _mapper.Map<Waterfall>(dto),
+                    "peak" => _mapper.Map<Peak>(dto),
+                    "monastery" => _mapper.Map<Monastery>(dto),
+                    "cave" => _mapper.Map<Cave>(dto),
+                    _ => throw new ArgumentException($"Invalid POI type '{dto.Type}'. Valid types are: {string.Join(", ", Enum.GetNames(typeof(PoiType)))}")
+                };
+            }
+            catch (JsonException ex)
+            {
+                throw new ArgumentException("Error parsing POI data. Please ensure the data is in the correct format.", ex);
+            }
+
+            var validationResult = await _validator.ValidateAsync(poi);
+            if (!validationResult.IsValid)
+            {
+                var errors = new List<ApiError>();
+
+                foreach (var error in validationResult.Errors)
+                {
+                    errors.Add(new ApiError
+                    {
+                        Field = error.PropertyName,
+                        Message = error.ErrorMessage
+                    });
+                }
+
+                throw new ApiException(errors);
+            }
+
+            await _context.PointsOfInterest.AddAsync(poi);
+            await _context.SaveChangesAsync();
+
+            return;
+        }
     }
 }

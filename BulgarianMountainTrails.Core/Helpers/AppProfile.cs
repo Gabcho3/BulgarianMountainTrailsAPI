@@ -27,6 +27,13 @@ namespace BulgarianMountainTrails.Core.Helpers
             CreateMap<HutDto, Hut>();
 
             CreateMap<TrailHutDto, TrailHut>();
+
+            CreateMap<PoiDto, River>();
+            CreateMap<PoiDto, Lake>();
+            CreateMap<PoiDto, Waterfall>();
+            CreateMap<PoiDto, Peak>();
+            CreateMap<PoiDto, Monastery>();
+            CreateMap<PoiDto, Cave>();
         }
     }
 }

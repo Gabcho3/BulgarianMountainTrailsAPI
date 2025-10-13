@@ -4,6 +4,7 @@ using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Core.Services;
 using BulgarianMountainTrails.Core.Validations;
 using BulgarianMountainTrails.Data;
+using BulgarianMountainTrails.Data.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ builder.Services.AddScoped<IPoiService, PoiService>();
 // Validators
 builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();
 builder.Services.AddScoped<IValidator<HutDto>, HutDtoValidator>();
+builder.Services.AddScoped<IValidator<PointOfInterest>, PoiValidator>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile(typeof(AppProfile)));

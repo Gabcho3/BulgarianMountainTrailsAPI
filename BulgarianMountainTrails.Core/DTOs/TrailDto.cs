@@ -22,7 +22,7 @@
 
         public List<SimpleHutDto> Huts { get; set; } = new();
 
-        public List<SimplePoiDto> PointsOfInterest { get; set; } = new();
+        public List<PoiDto> PointsOfInterest { get; set; } = new();
     }
 
     public class SimpleHutDto
@@ -35,16 +35,5 @@
         public string? PhoneNumber { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-    }
-
-    public class SimplePoiDto
-    {
-        public Guid Id { get; set; }
-        public required string Name { get; set; }
-        public string? Description { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public string? Mountain { get; set; }
-        public string PoiType { get; set; } = null!;
     }
 }
