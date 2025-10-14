@@ -1,13 +1,15 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Helpers;
 using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Core.Services;
 using BulgarianMountainTrails.Core.Validations;
+
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
-using FluentValidation;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +63,7 @@ app.UseExceptionHandler(errorApp =>
             return;
         }
         
-        if(exception is ApiException apiEx)
+        if (exception is ApiException apiEx)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new
