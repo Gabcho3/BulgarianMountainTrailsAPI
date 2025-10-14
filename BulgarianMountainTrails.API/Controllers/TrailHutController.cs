@@ -40,11 +40,11 @@ namespace BulgarianMountainTrails.API.Controllers
             return Ok(trailHutDto);
         }
 
-        // DELETE: /api/trailhut/{body}
+        // DELETE: /api/trailhut?trailId={trailId}&hutId={hutId}
         [HttpDelete]
-        public async Task<ActionResult> DeleteHutToTrail(TrailHutDto trailHutDto)
+        public async Task<ActionResult> DeleteHutToTrail(Guid trailId, Guid hutId)
         {
-            await _service.RemoveHutFromTrailAsync(trailHutDto);
+            await _service.RemoveHutFromTrailAsync(trailId, hutId);
             return Ok("Hut is successfully removed from the Trail!");
         }
     }

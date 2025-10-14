@@ -16,6 +16,7 @@ builder.Services.AddScoped<ITrailService, TrailService>();
 builder.Services.AddScoped<IHutService, HutService>();
 builder.Services.AddScoped<ITrailHutService, TrailHutService>();
 builder.Services.AddScoped<IPoiService, PoiService>();
+builder.Services.AddScoped<ITrailPoiService, TrailPoiService>();
 
 // Validators
 builder.Services.AddScoped<IValidator<TrailDto>, TrailDtoValidator>();

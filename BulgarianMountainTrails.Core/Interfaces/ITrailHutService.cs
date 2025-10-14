@@ -10,6 +10,6 @@ namespace BulgarianMountainTrails.Core.Interfaces
 
         Task AddHutToTrailAsync(TrailHutDto trailHutDto);
 
-        Task RemoveHutFromTrailAsync(TrailHutDto trailHutDto);
+        Task RemoveHutFromTrailAsync(Guid trailId, Guid hutId);
     }
 }

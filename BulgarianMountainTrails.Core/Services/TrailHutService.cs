@@ -76,12 +76,12 @@ namespace BulgarianMountainTrails.Core.Services
             return;
         }
 
-        public async Task RemoveHutFromTrailAsync(TrailHutDto trailHutDto)
+        public async Task RemoveHutFromTrailAsync(Guid trailId, Guid hutId)
         {
-            await TrailHutExistsAsync(trailHutDto.TrailId, trailHutDto.HutId);
+            await TrailHutExistsAsync(trailId, hutId);
 
             var trailHut = _context.TrailHuts
-                .FirstOrDefault(th => th.TrailId == trailHutDto.TrailId && th.HutId == trailHutDto.HutId);
+                .FirstOrDefault(th => th.TrailId == trailId && th.HutId == hutId);
 
             if (trailHut == null)
                 throw new ArgumentException("This Hut is not associated with the Trail!");
