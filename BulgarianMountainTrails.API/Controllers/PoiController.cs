@@ -1,6 +1,5 @@
 ﻿using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Interfaces;
-using BulgarianMountainTrails.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BulgarianMountainTrails.API.Controllers
@@ -29,8 +28,15 @@ namespace BulgarianMountainTrails.API.Controllers
         public async Task<IActionResult> GetPOIById(Guid id)
         {
             var poi = await _poiService.GetPOIByIdAsync(id);
-
             return Ok(poi);
+        }
+
+        //GET: /api/poi/trail/{trailId}?type=
+        [HttpGet("trail/{trailId}")]
+        public async Task<IActionResult> GetPOIsForTrail(Guid trailId, [FromQuery] string? type)
+        {
+            var pois = await _poiService.GetPOIsForTrailAsync(trailId, type);
+            return Ok(pois);
         }
 
         // POST: /api/poi
@@ -38,16 +44,15 @@ namespace BulgarianMountainTrails.API.Controllers
         public async Task<IActionResult> CreatePOI(PoiDto dto)
         {
             await _poiService.CreatePOIAsync(dto);
-
             return CreatedAtAction(nameof(GetPOIById), new { id = dto.Id }, dto);
         }
 
-        // GET: /api/poi/trail/{trailId}?type=
-        [HttpGet("trail/{trailId}")]
-        public async Task<IActionResult> GetPOIsForTrail(Guid trailId, [FromQuery] string? type)
+        // DELETE: /api/poi/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePOIAsync(Guid id)
         {
-            var pois = await _poiService.GetPOIsForTrailAsync(trailId, type);
-            return Ok(pois);
+            await _poiService.DeletePOIAsync(id);
+            return Ok("Successfully deleted!");
         }
     }
 }

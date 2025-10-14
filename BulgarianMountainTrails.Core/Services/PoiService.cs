@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 using BulgarianMountainTrails.Core.DTOs;
 using BulgarianMountainTrails.Core.Helpers;
@@ -9,7 +10,6 @@ using BulgarianMountainTrails.Core.Interfaces;
 using BulgarianMountainTrails.Data;
 using BulgarianMountainTrails.Data.Entities;
 using BulgarianMountainTrails.Data.Enums;
-using System.Text.Json;
 
 namespace BulgarianMountainTrails.Core.Services
 {
@@ -139,6 +139,19 @@ namespace BulgarianMountainTrails.Core.Services
             }
 
             await _context.PointsOfInterest.AddAsync(poi);
+            await _context.SaveChangesAsync();
+
+            return;
+        }
+
+        public async Task DeletePOIAsync(Guid id)
+        {
+            var poi = await _context.PointsOfInterest.FindAsync(id);
+
+            if (poi == null)
+                throw new KeyNotFoundException("POI not found!");
+
+            _context.PointsOfInterest.Remove(poi);
             await _context.SaveChangesAsync();
 
             return;

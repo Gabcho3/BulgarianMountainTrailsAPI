@@ -12,5 +12,7 @@ namespace BulgarianMountainTrails.Core.Interfaces
         Task CreatePOIAsync(PoiDto dto);
 
         Task<IEnumerable<PointOfInterest>> GetPOIsForTrailAsync(Guid trailId, string? type);
+
+        Task DeletePOIAsync(Guid id);
     }
 }
