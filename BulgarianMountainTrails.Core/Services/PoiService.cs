@@ -99,7 +99,7 @@ namespace BulgarianMountainTrails.Core.Services
 
         public async Task CreatePOIAsync(PoiDto dto)
         {
-          if (dto == null)
+            if (dto == null)
                 throw new ArgumentNullException(nameof(dto), "POI data is required!");
 
             PointOfInterest poi;
@@ -155,6 +155,31 @@ namespace BulgarianMountainTrails.Core.Services
             await _context.SaveChangesAsync();
 
             return;
+        }
+
+        public async Task<IEnumerable<PointOfInterest>> GetRiversAsync(double? minLength, double? maxLength)
+        {
+            var rivers = await _context.PointsOfInterest
+                .AsNoTracking()
+                .OfType<River>()
+                .ToListAsync();
+
+            if (minLength > maxLength)
+                throw new ArgumentException("Minimum length cannot be greater than maximum length!");
+
+            if (rivers.Count == 0)
+                throw new KeyNotFoundException("No rivers found! The database might be empty!");
+
+            if (minLength.HasValue)
+                rivers = rivers.Where(r => r.LengthKm >= minLength).ToList();
+
+            if (maxLength.HasValue)
+                rivers = rivers.Where(r => r.LengthKm <= maxLength).ToList();
+
+            if (rivers.Count == 0)
+                throw new KeyNotFoundException("No rivers found matching the specified criteria!");
+
+            return rivers;
         }
     }
 }

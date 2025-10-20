@@ -15,6 +15,8 @@ namespace BulgarianMountainTrails.API.Controllers
             _poiService = poiService;
         }
 
+        //Routing for all POIs
+
         //GET: /api/poi?type=
         [HttpGet]
         public async Task<IActionResult> GetAllPOIs([FromQuery] string? type)
@@ -53,6 +55,14 @@ namespace BulgarianMountainTrails.API.Controllers
         {
             await _poiService.DeletePOIAsync(id);
             return Ok("Successfully deleted!");
+        }
+
+        //Routing for specific POI types 
+        [HttpGet("rivers")]
+        public async Task<IActionResult> GetAllRivers([FromQuery] double? minLength, double? maxLength)
+        {
+            var pois = await _poiService.GetRiversAsync(minLength, maxLength);
+            return Ok(pois);
         }
     }
 }
