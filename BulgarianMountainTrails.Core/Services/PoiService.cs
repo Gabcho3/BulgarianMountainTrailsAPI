@@ -170,16 +170,37 @@ namespace BulgarianMountainTrails.Core.Services
             if (rivers.Count == 0)
                 throw new KeyNotFoundException("No rivers found! The database might be empty!");
 
-            if (minLength.HasValue)
-                rivers = rivers.Where(r => r.LengthKm >= minLength).ToList();
-
-            if (maxLength.HasValue)
-                rivers = rivers.Where(r => r.LengthKm <= maxLength).ToList();
+            rivers = rivers.Where(r => (!minLength.HasValue || r.LengthKm >= minLength) && (!maxLength.HasValue || r.LengthKm <= maxLength)).ToList();
 
             if (rivers.Count == 0)
                 throw new KeyNotFoundException("No rivers found matching the specified criteria!");
 
             return rivers;
+        }
+
+        public async Task<IEnumerable<Lake>> GetLakesAsync(double? minArea, double? maxArea, double? minDepth, double? maxDepth)
+        {
+            var lakes = await _context.PointsOfInterest
+                .AsNoTracking()
+                .OfType<Lake>()
+                .ToListAsync();
+
+            if (minArea > maxArea) 
+                throw new ArgumentException("Minumum area cannot be greater than maximum area.");
+
+            if (minDepth > maxDepth)
+                throw new ArgumentException("Minumum depth cannot be greater than maximum depth.");
+
+            if (lakes.Count == 0)
+                throw new KeyNotFoundException("No rivers found! The database might be empty!");
+
+            lakes = lakes.Where(l => (!minArea.HasValue || l.AreaKm2 >= minArea) && (!maxArea.HasValue || l.AreaKm2 <= maxArea)).ToList();
+            lakes = lakes.Where(l => (!minDepth.HasValue || l.DepthM >= minDepth) && (!maxDepth.HasValue || l.DepthM <= maxDepth)).ToList();
+
+            if (lakes.Count == 0)
+                throw new KeyNotFoundException("No lakes found matching the sepcified criteria!");
+
+            return lakes;
         }
     }
 }

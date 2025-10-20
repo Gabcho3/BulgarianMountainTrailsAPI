@@ -61,8 +61,15 @@ namespace BulgarianMountainTrails.API.Controllers
         [HttpGet("rivers")]
         public async Task<IActionResult> GetAllRivers([FromQuery] double? minLength, double? maxLength)
         {
-            var pois = await _poiService.GetRiversAsync(minLength, maxLength);
-            return Ok(pois);
+            var rivers = await _poiService.GetRiversAsync(minLength, maxLength);
+            return Ok(rivers);
+        }
+
+        [HttpGet("lakes")]
+        public async Task<IActionResult> GetAllLakes([FromQuery] double? minArea, double? maxArea, double? minDepth, double? maxDepth)
+        {
+            var lakes = await _poiService.GetLakesAsync(minArea, maxArea, minDepth, maxDepth);
+            return Ok(lakes);
         }
     }
 }

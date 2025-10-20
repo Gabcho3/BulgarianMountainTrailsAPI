@@ -18,5 +18,7 @@ namespace BulgarianMountainTrails.Core.Interfaces
 
         //Methods for specific POI types
         Task<IEnumerable<PointOfInterest>> GetRiversAsync(double? minLength, double? maxLength);
+
+        Task<IEnumerable<PointOfInterest>> GetLakesAsync(double? minArea, double? maxArea, double? minDepth, double? maxDepth);
     }
 }
