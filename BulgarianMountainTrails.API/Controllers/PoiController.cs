@@ -19,9 +19,9 @@ namespace BulgarianMountainTrails.API.Controllers
 
         //GET: /api/poi?type=
         [HttpGet]
-        public async Task<IActionResult> GetAllPOIs([FromQuery] string? type)
+        public async Task<IActionResult> GetAllPOIs()
         {
-            var pois = await _poiService.GetAllPOIsAsync(type);
+            var pois = await _poiService.GetAllPOIsAsync();
             return Ok(pois);
         }
 
@@ -70,6 +70,34 @@ namespace BulgarianMountainTrails.API.Controllers
         {
             var lakes = await _poiService.GetLakesAsync(minArea, maxArea, minDepth, maxDepth);
             return Ok(lakes);
+        }
+
+        [HttpGet("waterfalls")]
+        public async Task<IActionResult> GetAllWaterfalls([FromQuery] double? minHeight, double? maxHeight)
+        {
+            var waterfalls = await _poiService.GetWaterfallsAsync(minHeight, maxHeight);
+            return Ok(waterfalls);
+        }
+
+        [HttpGet("peaks")]
+        public async Task<IActionResult> GetAllPeaks([FromQuery] int? minElevation, int? maxElevation)
+        {
+            var peaks = await _poiService.GetPeaksAsync(minElevation, maxElevation);
+            return Ok(peaks);
+        }
+
+        [HttpGet("monasteries")]
+        public async Task<IActionResult> GetAllMonasteries([FromQuery] int? after, int? before)
+        {
+            var monastery = await _poiService.GetMonasteriesAsync(after, before);
+            return Ok(monastery);
+        }
+
+        [HttpGet("caves")]
+        public async Task<IActionResult> GetAllCaves([FromQuery] int? minLength, int? maxLength, bool? accessible)
+        {
+            var caves = await _poiService.GetCavesAsync(minLength, maxLength, accessible);
+            return Ok(caves);
         }
     }
 }
